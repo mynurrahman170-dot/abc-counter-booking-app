@@ -51,8 +51,6 @@ function SeatBookingPage() {
 
   const [tripId, setTripId] = useState("");
   const [seats, setSeats] = useState<string[]>([]);
-  const [passengerName, setPassengerName] = useState("");
-  const [passengerPhone, setPassengerPhone] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [staffPointId, setStaffPointId] = useState("");
   const [ticket, setTicket] = useState<TicketData | null>(null);
@@ -204,8 +202,8 @@ function SeatBookingPage() {
           seat_numbers: seats,
           fare_per_seat: seats.length > 0 ? amount / seats.length : 0,
           amount,
-          passenger_name: passengerName.trim() || null,
-          passenger_phone: passengerPhone.trim() || null,
+          passenger_name: null,
+          passenger_phone: null,
           status: "confirmed",
           created_by: session?.userId ?? null,
         })
@@ -224,8 +222,8 @@ function SeatBookingPage() {
         time: trip?.departure_time?.slice(0, 5) ?? "—",
         vehicle: trip?.vehicles?.vehicle_number ?? "—",
         seats: row.seat_numbers ?? [],
-        passengerName: row.passenger_name ?? "",
-        passengerPhone: row.passenger_phone ?? "",
+        passengerName: "",
+        passengerPhone: "",
         farePerSeat: Number(row.fare_per_seat ?? 0),
         amount: Number(row.amount ?? 0),
       });
@@ -413,7 +411,6 @@ function SeatBookingPage() {
                 <TableHead>{t("ticketNo")}</TableHead>
                 <TableHead>{t("bookingPoint")}</TableHead>
                 <TableHead>{t("seats")}</TableHead>
-                <TableHead>{t("passengerName")}</TableHead>
                 <TableHead>{t("amount")}</TableHead>
                 <TableHead className="text-right">{t("actions")}</TableHead>
               </TableRow>
@@ -421,7 +418,7 @@ function SeatBookingPage() {
             <TableBody>
               {(bookings?.length ?? 0) === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-muted-foreground">
+                  <TableCell colSpan={5} className="text-muted-foreground">
                     {t("noData")}
                   </TableCell>
                 </TableRow>
@@ -435,7 +432,6 @@ function SeatBookingPage() {
                   >
                     {(b.seat_numbers ?? []).join(", ")}
                   </TableCell>
-                  <TableCell>{b.passenger_name ?? "—"}</TableCell>
                   <TableCell>৳{b.amount}</TableCell>
                   <TableCell className="space-x-1 text-right">
                     <Button
