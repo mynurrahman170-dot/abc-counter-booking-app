@@ -384,26 +384,7 @@ function SeatBookingPage() {
                 <Label>{t("seatsSelected")}</Label>
                 <Input readOnly value={`${seats.length} — ${seats.join(", ")}`} />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="sb-pname">{t("passengerName")}</Label>
-                <Input
-                  id="sb-pname"
-                  value={passengerName}
-                  onChange={(e) => setPassengerName(e.target.value)}
-                  maxLength={80}
-                  required
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="sb-pphone">{t("passengerPhone")}</Label>
-                <Input
-                  id="sb-pphone"
-                  value={passengerPhone}
-                  onChange={(e) => setPassengerPhone(e.target.value)}
-                  maxLength={20}
-                  required
-                />
-              </div>
+              
               <div className="space-y-1.5">
                 <Label htmlFor="sb-amount">{t("totalFare")}</Label>
                 <Input
