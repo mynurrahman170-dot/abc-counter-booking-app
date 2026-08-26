@@ -228,8 +228,6 @@ function SeatBookingPage() {
         amount: Number(row.amount ?? 0),
       });
       setSeats([]);
-      setPassengerName("");
-      setPassengerPhone("");
       setTotalAmount("");
       void qc.invalidateQueries({ queryKey: ["seat_bookings", tripId] });
       void qc.invalidateQueries({ queryKey: ["trip_seat_locks", tripId] });
