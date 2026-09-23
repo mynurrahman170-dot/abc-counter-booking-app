@@ -26,12 +26,12 @@ import {
 export const Route = createFileRoute("/_authenticated/bookings")({
   head: () => ({
     meta: [
-      { title: "Bookings | Chandra Paribahan Booking System" },
+      { title: "Bookings | ZB SYSTEM" },
       {
         name: "description",
         content: "Search bookings, cancel seats and review the audit trail for each booking point.",
       },
-      { property: "og:title", content: "Bookings | Chandra Paribahan Booking System" },
+      { property: "og:title", content: "Bookings | ZB SYSTEM" },
       {
         property: "og:description",
         content: "Search, cancel and audit seat bookings per booking point.",

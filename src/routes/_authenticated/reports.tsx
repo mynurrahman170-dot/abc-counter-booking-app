@@ -23,12 +23,12 @@ import {
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
-      { title: "Reports | Chandra Paribahan Booking System" },
+      { title: "Reports | ZB SYSTEM" },
       {
         name: "description",
         content: "Daily sales and seat occupancy reports per booking point with date filters and PDF export.",
       },
-      { property: "og:title", content: "Reports | Chandra Paribahan Booking System" },
+      { property: "og:title", content: "Reports | ZB SYSTEM" },
       {
         property: "og:description",
         content: "Daily sales and occupancy per booking point, exportable to PDF.",

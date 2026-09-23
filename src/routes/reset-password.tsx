@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset Password | Chandra Paribahan Booking System" },
+      { title: "Reset Password | ZB SYSTEM" },
       {
         name: "description",
         content: "Set a new password for your Chandra Paribahan booking system admin account.",
       },
-      { property: "og:title", content: "Reset Password | Chandra Paribahan Booking System" },
+      { property: "og:title", content: "Reset Password | ZB SYSTEM" },
       { property: "og:description", content: "Set a new password for your admin account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

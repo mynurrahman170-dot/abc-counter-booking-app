@@ -18,12 +18,12 @@ import {
 export const Route = createFileRoute("/_authenticated/database")({
   head: () => ({
     meta: [
-      { title: "Database | Chandra Paribahan Booking" },
+      { title: "Database | ZB SYSTEM" },
       {
         name: "description",
         content: "Full database view: staff IDs, vehicles, booking points, routes and supervisors.",
       },
-      { property: "og:title", content: "Database | Chandra Paribahan Booking" },
+      { property: "og:title", content: "Database | ZB SYSTEM" },
       {
         property: "og:description",
         content: "Complete record of staff logins, buses, booking points, routes and supervisors.",
