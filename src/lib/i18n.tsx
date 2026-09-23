@@ -198,6 +198,10 @@ const dict = {
   allPoints: { bn: "সব পয়েন্ট", en: "All points" },
   bookedBy: { bn: "বুক করেছে", en: "Booked by" },
   otherPoint: { bn: "অন্য পয়েন্ট", en: "Other point" },
+  manualEntry: { bn: "ম্যানুয়াল এন্ট্রি", en: "Manual entry" },
+  fromSchedule: { bn: "শিডিউল থেকে", en: "From schedule" },
+  scheduleLoaded: { bn: "শিডিউল থেকে তথ্য বসানো হয়েছে — প্রয়োজনে এডিট করুন", en: "Filled from schedule — edit if needed" },
+  noScheduleFound: { bn: "এই তারিখে এই গাড়ির শিডিউল নেই", en: "No schedule for this vehicle on this date" },
   secretCode: { bn: "গোপন কোড", en: "Secret code" },
   recoverCodeHelp: {
     bn: "আইডি/ইমেইল ও গোপন কোড দিন, তারপর নতুন পাসওয়ার্ড/পিন সেট করুন।",
