@@ -371,18 +371,21 @@ export type Database = {
       trip_seat_locks: {
         Row: {
           booking_id: string
+          booking_point_id: string | null
           created_at: string
           seat_number: string
           trip_id: string
         }
         Insert: {
           booking_id: string
+          booking_point_id?: string | null
           created_at?: string
           seat_number: string
           trip_id: string
         }
         Update: {
           booking_id?: string
+          booking_point_id?: string | null
           created_at?: string
           seat_number?: string
           trip_id?: string
