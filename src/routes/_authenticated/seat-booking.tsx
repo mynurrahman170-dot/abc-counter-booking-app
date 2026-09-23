@@ -39,6 +39,18 @@ export const Route = createFileRoute("/_authenticated/seat-booking")({
   component: SeatBookingPage,
 });
 
+const POINT_COLORS = [
+  "hsl(0 75% 50%)", "hsl(215 80% 50%)", "hsl(140 60% 38%)", "hsl(30 90% 50%)",
+  "hsl(280 60% 50%)", "hsl(180 70% 35%)", "hsl(330 75% 50%)", "hsl(50 90% 42%)",
+  "hsl(260 30% 35%)", "hsl(15 60% 35%)", "hsl(95 55% 40%)", "hsl(200 90% 40%)",
+];
+function pointColor(id: string, points: { id: string }[]) {
+  const sorted = [...points].map((p) => p.id).sort();
+  let i = sorted.indexOf(id);
+  if (i < 0) i = [...id].reduce((a, c) => a + c.charCodeAt(0), 0);
+  return POINT_COLORS[i % POINT_COLORS.length];
+}
+
 const selectClass =
   "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground";
 
@@ -92,7 +104,7 @@ function SeatBookingPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_seat_locks")
-        .select("seat_number, booking_id")
+        .select("seat_number, booking_id, booking_point_id")
         .eq("trip_id", tripId);
       if (error) throw error;
       return data;
@@ -128,15 +140,24 @@ function SeatBookingPage() {
   }, [bookings]);
 
   const bookedMap = useMemo(() => {
-    const map = new Map<string, { point: string; id: string }>();
+    const map = new Map<string, { point: string; id: string; color?: string }>();
     for (const l of locks ?? []) {
+      const pid = (l as { booking_point_id?: string | null }).booking_point_id ?? null;
+      const p = pid ? points?.find((x) => x.id === pid) : undefined;
       map.set(l.seat_number, {
-        point: visibleByBooking.get(l.booking_id) ?? t("otherPoint"),
+        point: p?.name ?? visibleByBooking.get(l.booking_id) ?? t("otherPoint"),
         id: l.booking_id,
+        color: pid ? pointColor(pid, points ?? []) : undefined,
       });
     }
     return map;
-  }, [locks, visibleByBooking, t]);
+  }, [locks, visibleByBooking, t, points]);
+
+  const legend = useMemo(() => {
+    const seen = new Map<string, { name: string; color: string }>();
+    for (const v of bookedMap.values()) if (v.color) seen.set(v.color, { name: v.point, color: v.color });
+    return [...seen.values()];
+  }, [bookedMap]);
 
   const seatRows = useMemo(() => buildSeatRows(trip?.total_seats ?? 44), [trip?.total_seats]);
   const myTotal = (bookings ?? [])
@@ -367,6 +388,15 @@ function SeatBookingPage() {
                 selected={seats}
                 onToggle={toggleSeat}
               />
+              {legend.length > 0 && (
+                <div className="mt-3 flex flex-wrap justify-center gap-3 text-xs">
+                  {legend.map((l) => (
+                    <span key={l.color} className="flex items-center gap-1.5">
+                      <span className="size-3 rounded-sm" style={{ background: l.color }} /> {l.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <form
@@ -483,6 +513,38 @@ function TripForm({
     departure_time: "",
     fare: "",
   });
+  const [mode, setMode] = useState<"manual" | "schedule">("manual");
+  const [lookupNo, setLookupNo] = useState("");
+  const { data: schedules } = useQuery({
+    queryKey: ["schedules-for-trip", form.departure_date],
+    enabled: mode === "schedule",
+    queryFn: async () =>
+      (
+        await supabase
+          .from("schedules")
+          .select("vehicle_id, supervisor_id, route, departure_time, fare, vehicles(vehicle_number)")
+          .eq("departure_date", form.departure_date)
+      ).data ?? [],
+  });
+  const lookupMatches = useMemo(() => {
+    const q = lookupNo.trim().toLowerCase();
+    if (!q) return [];
+    return (schedules ?? []).filter((sc) =>
+      (sc.vehicles?.vehicle_number ?? "").toLowerCase().includes(q),
+    );
+  }, [schedules, lookupNo]);
+  function applySchedule(sc: (typeof lookupMatches)[number]) {
+    setForm((f) => ({
+      ...f,
+      vehicle_id: sc.vehicle_id ?? "",
+      supervisor_id: sc.supervisor_id ?? "",
+      route: sc.route ?? "",
+      departure_time: sc.departure_time?.slice(0, 5) ?? "",
+      fare: sc.fare != null ? String(sc.fare) : "",
+    }));
+    setLookupNo(sc.vehicles?.vehicle_number ?? lookupNo);
+    toast.success(t("scheduleLoaded"));
+  }
 
   const create = useMutation({
     mutationFn: async () => {
@@ -521,6 +583,42 @@ function TripForm({
       <h2 className="font-display text-lg uppercase tracking-wide sm:col-span-2 lg:col-span-4">
         {t("createTrip")} · {t("masterPoint")}
       </h2>
+      <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-4">
+        <Button type="button" size="sm" variant={mode === "manual" ? "default" : "outline"} onClick={() => setMode("manual")}>
+          {t("manualEntry")}
+        </Button>
+        <Button type="button" size="sm" variant={mode === "schedule" ? "default" : "outline"} onClick={() => setMode("schedule")}>
+          {t("fromSchedule")}
+        </Button>
+      </div>
+      {mode === "schedule" && (
+        <div className="space-y-2 rounded-md border border-border bg-muted/40 p-3 sm:col-span-2 lg:col-span-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="tf-sdate">{t("date")}</Label>
+              <Input id="tf-sdate" type="date" value={form.departure_date}
+                onChange={(e) => setForm({ ...form, departure_date: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="tf-lookup">{t("vehicleNumber")}</Label>
+              <Input id="tf-lookup" value={lookupNo} onChange={(e) => setLookupNo(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); if (lookupMatches[0]) applySchedule(lookupMatches[0]); }
+                }} />
+            </div>
+          </div>
+          {lookupNo.trim() && lookupMatches.length === 0 && (
+            <p className="text-xs text-muted-foreground">{t("noScheduleFound")}</p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {lookupMatches.map((sc, i) => (
+              <Button key={i} type="button" size="sm" variant="secondary" onClick={() => applySchedule(sc)}>
+                {sc.vehicles?.vehicle_number} · {sc.departure_time?.slice(0, 5)} · {sc.route}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="space-y-1.5">
         <Label htmlFor="tf-vehicle">{t("vehicleNumber")}</Label>
         <select
