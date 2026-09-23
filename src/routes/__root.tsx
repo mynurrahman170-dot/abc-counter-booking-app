@@ -80,15 +80,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Chandra Paribahan Booking System" },
+      { title: "ZB SYSTEM" },
       {
         name: "description",
-        content: "Chandra Paribahan Booking System — vehicles, booking points and schedules in one place.",
+        content: "ZB SYSTEM — counter booking information: vehicles, booking points and schedules in one place.",
       },
-      { property: "og:title", content: "Chandra Paribahan Booking System" },
+      { property: "og:title", content: "ZB SYSTEM" },
       {
         property: "og:description",
-        content: "Chandra Paribahan Booking System — vehicles, booking points and schedules in one place.",
+        content: "ZB SYSTEM — counter booking information: vehicles, booking points and schedules in one place.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -5,8 +5,8 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 export type Lang = "bn" | "en";
 
 const dict = {
-  appName: { bn: "চন্দ্রা পরিবহন", en: "Chandra Paribahan" },
-  appSubtitle: { bn: "বুকিং সিস্টেম", en: "Booking System" },
+  appName: { bn: "ZB SYSTEM", en: "ZB SYSTEM" },
+  appSubtitle: { bn: "কাউন্টার বুকিং ইনফরমেশন", en: "Counter Booking Information" },
   tagline: {
     bn: "বাংলাদেশের নির্ভরযোগ্য পরিবহন সেবা",
     en: "Bangladesh's trusted transport service",

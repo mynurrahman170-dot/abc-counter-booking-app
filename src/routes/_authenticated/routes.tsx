@@ -23,12 +23,12 @@ import {
 export const Route = createFileRoute("/_authenticated/routes")({
   head: () => ({
     meta: [
-      { title: "Add Route | Chandra Paribahan Booking System" },
+      { title: "Add Route | ZB SYSTEM" },
       {
         name: "description",
         content: "Create and manage bus routes with start and end points for trip planning.",
       },
-      { property: "og:title", content: "Add Route | Chandra Paribahan Booking System" },
+      { property: "og:title", content: "Add Route | ZB SYSTEM" },
       { property: "og:description", content: "Create and manage bus routes for trips." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
