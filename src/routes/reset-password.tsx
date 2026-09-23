@@ -14,7 +14,7 @@ export const Route = createFileRoute("/reset-password")({
       { title: "Reset Password | ZB SYSTEM" },
       {
         name: "description",
-        content: "Set a new password for your Chandra Paribahan booking system admin account.",
+        content: "Set a new password for your ZB SYSTEM admin account.",
       },
       { property: "og:title", content: "Reset Password | ZB SYSTEM" },
       { property: "og:description", content: "Set a new password for your admin account." },
