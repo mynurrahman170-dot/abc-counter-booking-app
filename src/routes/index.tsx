@@ -15,16 +15,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sign In | Chandra Paribahan Booking System" },
+      { title: "Sign In | ZB SYSTEM" },
       {
         name: "description",
-        content:
-          "Sign in to Chandra Paribahan Booking System as master admin, moderator or booking point.",
+        content: "Sign in to ZB SYSTEM as master admin, moderator or booking point.",
       },
-      { property: "og:title", content: "Sign In | Chandra Paribahan Booking System" },
+      { property: "og:title", content: "Sign In | ZB SYSTEM" },
       {
         property: "og:description",
-        content: "Master admin, moderator and booking point login for Chandra Paribahan.",
+        content: "Master admin, moderator and booking point login for ZB SYSTEM.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
