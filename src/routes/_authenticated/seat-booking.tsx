@@ -140,7 +140,7 @@ function SeatBookingPage() {
   }, [bookings]);
 
   const bookedMap = useMemo(() => {
-    const map = new Map<string, { point: string; id: string; color?: string }>();
+    const map = new Map<string, { point: string; id: string; color?: string | undefined }>();
     for (const l of locks ?? []) {
       const pid = (l as { booking_point_id?: string | null }).booking_point_id ?? null;
       const p = pid ? points?.find((x) => x.id === pid) : undefined;

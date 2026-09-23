@@ -3,7 +3,7 @@ import { useI18n } from "@/lib/i18n";
 
 type Props = {
   rows: SeatRow[];
-  bookedMap: Map<string, { point: string; id: string; color?: string }>;
+  bookedMap: Map<string, { point: string; id: string; color?: string | undefined }>;
   selected: string[];
   onToggle: (seat: string) => void;
 };
