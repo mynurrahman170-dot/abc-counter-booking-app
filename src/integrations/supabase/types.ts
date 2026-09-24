@@ -418,6 +418,7 @@ export type Database = {
           master_point_id: string | null
           route: string | null
           route_id: string | null
+          schedule_id: string | null
           supervisor_id: string | null
           total_seats: number
           updated_at: string
@@ -433,6 +434,7 @@ export type Database = {
           master_point_id?: string | null
           route?: string | null
           route_id?: string | null
+          schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
           updated_at?: string
@@ -448,6 +450,7 @@ export type Database = {
           master_point_id?: string | null
           route?: string | null
           route_id?: string | null
+          schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
           updated_at?: string
@@ -466,6 +469,13 @@ export type Database = {
             columns: ["route_id"]
             isOneToOne: false
             referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "schedules"
             referencedColumns: ["id"]
           },
           {
