@@ -515,6 +515,13 @@ function TripForm({
   });
   const [mode, setMode] = useState<"manual" | "schedule">("manual");
   const [lookupNo, setLookupNo] = useState("");
+  const [scheduleId, setScheduleId] = useState<string | null>(null);
+  const { data: usedSchedules } = useQuery({
+    queryKey: ["trips", "schedule-ids"],
+    enabled: mode === "schedule",
+    queryFn: async () =>
+      new Set(((await supabase.from("trips").select("schedule_id").not("schedule_id", "is", null)).data ?? []).map((r) => r.schedule_id as string)),
+  });
   const { data: schedules } = useQuery({
     queryKey: ["schedules-for-trip", form.departure_date],
     enabled: mode === "schedule",
@@ -522,7 +529,7 @@ function TripForm({
       (
         await supabase
           .from("schedules")
-          .select("vehicle_id, supervisor_id, route, departure_time, fare, vehicles(vehicle_number)")
+          .select("id, vehicle_id, supervisor_id, route, departure_time, fare, vehicles(vehicle_number)")
           .eq("departure_date", form.departure_date)
       ).data ?? [],
   });
@@ -534,6 +541,11 @@ function TripForm({
     );
   }, [schedules, lookupNo]);
   function applySchedule(sc: (typeof lookupMatches)[number]) {
+    if (usedSchedules?.has(sc.id)) {
+      toast.error(t("scheduleTripExists"));
+      return;
+    }
+    setScheduleId(sc.id);
     setForm((f) => ({
       ...f,
       vehicle_id: sc.vehicle_id ?? "",
@@ -550,6 +562,11 @@ function TripForm({
     mutationFn: async () => {
       const masterPointId = isStaff ? form.master_point_id : (session?.bookingPointId ?? "");
       if (!masterPointId) throw new Error(t("noBookingPointLinked"));
+      const sid = mode === "schedule" ? scheduleId : null;
+      if (sid) {
+        const { data: dup } = await supabase.from("trips").select("id").eq("schedule_id", sid).limit(1);
+        if (dup && dup.length) throw new Error(t("scheduleTripExists"));
+      }
       const seatCount = vehicles.find((v) => v.id === form.vehicle_id)?.seat_count || 44;
       const { error } = await supabase.from("trips").insert({
         vehicle_id: form.vehicle_id || null,
@@ -561,11 +578,17 @@ function TripForm({
         total_seats: seatCount,
         fare: Number(form.fare) || 0,
         created_by: session?.userId ?? null,
+        schedule_id: sid,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") throw new Error(t("scheduleTripExists"));
+        throw error;
+      }
     },
     onSuccess: () => {
       toast.success(t("saved"));
+      setScheduleId(null);
+      setLookupNo("");
       setForm({ ...form, departure_time: "", route: "", fare: "" });
       void qc.invalidateQueries({ queryKey: ["trips"] });
     },
@@ -584,7 +607,7 @@ function TripForm({
         {t("createTrip")} · {t("masterPoint")}
       </h2>
       <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-4">
-        <Button type="button" size="sm" variant={mode === "manual" ? "default" : "outline"} onClick={() => setMode("manual")}>
+        <Button type="button" size="sm" variant={mode === "manual" ? "default" : "outline"} onClick={() => { setMode("manual"); setScheduleId(null); }}>
           {t("manualEntry")}
         </Button>
         <Button type="button" size="sm" variant={mode === "schedule" ? "default" : "outline"} onClick={() => setMode("schedule")}>
@@ -612,8 +635,9 @@ function TripForm({
           )}
           <div className="flex flex-wrap gap-2">
             {lookupMatches.map((sc, i) => (
-              <Button key={i} type="button" size="sm" variant="secondary" onClick={() => applySchedule(sc)}>
+              <Button key={i} type="button" size="sm" variant={scheduleId === sc.id ? "default" : "secondary"} disabled={usedSchedules?.has(sc.id)} onClick={() => applySchedule(sc)}>
                 {sc.vehicles?.vehicle_number} · {sc.departure_time?.slice(0, 5)} · {sc.route}
+                {usedSchedules?.has(sc.id) ? ` · ${t("tripCreated")}` : ""}
               </Button>
             ))}
           </div>

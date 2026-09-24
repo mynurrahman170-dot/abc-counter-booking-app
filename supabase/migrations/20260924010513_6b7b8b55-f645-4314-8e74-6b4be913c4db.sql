@@ -1,0 +1,2 @@
+ALTER TABLE public.trips ADD COLUMN IF NOT EXISTS schedule_id uuid REFERENCES public.schedules(id) ON DELETE SET NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS trips_schedule_id_unique ON public.trips(schedule_id) WHERE schedule_id IS NOT NULL;
