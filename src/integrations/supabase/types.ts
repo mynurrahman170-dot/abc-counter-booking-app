@@ -77,6 +77,45 @@ export type Database = {
         }
         Relationships: []
       }
+      change_log: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          field: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          trip_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          field: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          trip_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          trip_id?: string | null
+        }
+        Relationships: []
+      }
       credential_requests: {
         Row: {
           created_at: string
