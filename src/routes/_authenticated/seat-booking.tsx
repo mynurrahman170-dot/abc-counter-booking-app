@@ -528,7 +528,7 @@ function TripForm({
   });
   const lookupMatches = useMemo(() => {
     const q = lookupNo.trim().toLowerCase();
-    if (!q) return [];
+    if (!q) return schedules ?? [];
     return (schedules ?? []).filter((sc) =>
       (sc.vehicles?.vehicle_number ?? "").toLowerCase().includes(q),
     );
