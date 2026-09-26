@@ -66,6 +66,10 @@ function SeatBookingPage() {
   const [totalAmount, setTotalAmount] = useState("");
   const [staffPointId, setStaffPointId] = useState("");
   const [ticket, setTicket] = useState<TicketData | null>(null);
+  const [fDate, setFDate] = useState(() => new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 10));
+  const [fVehicle, setFVehicle] = useState("");
+  const [fPoint, setFPoint] = useState("");
+  const [fStatus, setFStatus] = useState("");
 
   const { data: vehicles } = useQuery({
     queryKey: ["vehicles"],
@@ -291,6 +295,42 @@ function SeatBookingPage() {
   });
 
 
+  const { data: tripChanges } = useQuery({
+    queryKey: ["change_log_trips"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("change_log")
+        .select("*")
+        .eq("entity_type", "trip")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      return data ?? [];
+    },
+  });
+  const changedTripIds = useMemo(() => new Set((tripChanges ?? []).map((c) => c.trip_id ?? c.entity_id)), [tripChanges]);
+
+  const filteredTrips = useMemo(() => {
+    const now = new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 16).replace("T", " ");
+    const q = fVehicle.trim().toLowerCase();
+    return (trips ?? []).filter((tr) => {
+      if (fDate && tr.departure_date !== fDate) return false;
+      if (q && !(tr.vehicles?.vehicle_number ?? "").toLowerCase().includes(q)) return false;
+      if (fPoint && tr.master_point_id !== fPoint) return false;
+      const dt = `${tr.departure_date} ${tr.departure_time?.slice(0, 5)}`;
+      if (fStatus === "upcoming" && dt < now) return false;
+      if (fStatus === "departed" && dt >= now) return false;
+      if (fStatus === "schedule" && !tr.schedule_id) return false;
+      if (fStatus === "changed" && !changedTripIds.has(tr.id)) return false;
+      return true;
+    });
+  }, [trips, fDate, fVehicle, fPoint, fStatus, changedTripIds]);
+
+  const selectedTripChanges = useMemo(
+    () => (tripChanges ?? []).filter((c) => (c.trip_id ?? c.entity_id) === tripId).slice(0, 5),
+    [tripChanges, tripId],
+  );
+
   function toggleSeat(seat: string) {
     if (bookedMap.has(seat)) return;
     setSeats((prev) => (prev.includes(seat) ? prev.filter((s) => s !== seat) : [...prev, seat]));
@@ -305,6 +345,36 @@ function SeatBookingPage() {
       )}
 
       <div className="panel space-y-4 p-5">
+        <div className="grid gap-3 rounded-lg border border-border bg-muted/30 p-3 sm:grid-cols-4">
+          <div className="space-y-1">
+            <Label htmlFor="f-date">তারিখ</Label>
+            <Input id="f-date" type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-veh">গাড়ি নম্বর</Label>
+            <div className="flex gap-1">
+              <Input id="f-veh" value={fVehicle} placeholder="খুঁজুন" onChange={(e) => setFVehicle(e.target.value)} />
+              {fVehicle && <Button type="button" variant="ghost" size="sm" onClick={() => setFVehicle("")}>✕</Button>}
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-point">বুকিং পয়েন্ট</Label>
+            <select id="f-point" className={selectClass} value={fPoint} onChange={(e) => setFPoint(e.target.value)}>
+              <option value="">সব</option>
+              {points?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-status">অবস্থা</Label>
+            <select id="f-status" className={selectClass} value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
+              <option value="">সব</option>
+              <option value="upcoming">আসন্ন</option>
+              <option value="departed">ছেড়ে গেছে</option>
+              <option value="schedule">শিডিউল থেকে</option>
+              <option value="changed">পরিবর্তিত</option>
+            </select>
+          </div>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="sb-trip">{t("trip")}</Label>
@@ -318,14 +388,14 @@ function SeatBookingPage() {
               }}
             >
               <option value="">{t("selectTrip")}</option>
-              {trips?.map((tr) => (
+              {filteredTrips.map((tr) => (
                 <option key={tr.id} value={tr.id}>
                   {tr.departure_date} {tr.departure_time?.slice(0, 5)} ·{" "}
                   {tr.vehicles?.vehicle_number ?? "—"} · {tr.booking_points?.name ?? "—"}
                 </option>
               ))}
             </select>
-            {(trips?.length ?? 0) === 0 && (
+            {filteredTrips.length === 0 && (
               <p className="text-xs text-muted-foreground">{t("noTrips")}</p>
             )}
           </div>
@@ -349,6 +419,18 @@ function SeatBookingPage() {
           )}
         </div>
 
+        {trip && selectedTripChanges.length > 0 && (
+          <div role="alert" className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm">
+            <p className="font-semibold text-destructive">⚠ এই ট্রিপে পরিবর্তন হয়েছে{trip.schedule_id ? " (শিডিউল থেকে তৈরি)" : ""}</p>
+            <ul className="mt-1 space-y-0.5 text-xs">
+              {selectedTripChanges.map((c) => (
+                <li key={c.id}>
+                  {new Date(c.created_at).toLocaleString("bn-BD")} · {c.actor_name ?? "—"} · {c.field}: {c.old_value ?? "—"} → {c.new_value ?? "—"}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {trip && (
           <>
             <div className="grid gap-2 text-sm sm:grid-cols-3">
