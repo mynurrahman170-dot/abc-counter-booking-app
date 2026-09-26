@@ -25,7 +25,8 @@ export function buildSeatRows(totalSeats: number): SeatRow[] {
   }
 
   if (hasExtra) {
-    rows.unshift({ letter: "E", seats: ["E1"] });
+    // Unique id "EX" so it never clashes with regular row E (E1–E4).
+    rows.unshift({ letter: "EX", seats: ["EX"] });
   }
 
   return rows;
