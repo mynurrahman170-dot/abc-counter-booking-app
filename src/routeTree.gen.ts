@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
+import { Route as AuthenticatedAiSummaryRouteImport } from './routes/_authenticated/ai-summary'
 import { Route as AuthenticatedBookingPointsRouteImport } from './routes/_authenticated/booking-points'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
+import { Route as AuthenticatedChangeHistoryRouteImport } from './routes/_authenticated/change-history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDatabaseRouteImport } from './routes/_authenticated/database'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -43,6 +45,11 @@ const AuthenticatedAccountsRoute = AuthenticatedAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAiSummaryRoute = AuthenticatedAiSummaryRouteImport.update({
+  id: '/ai-summary',
+  path: '/ai-summary',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBookingPointsRoute =
   AuthenticatedBookingPointsRouteImport.update({
     id: '/booking-points',
@@ -54,6 +61,12 @@ const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedChangeHistoryRoute =
+  AuthenticatedChangeHistoryRouteImport.update({
+    id: '/change-history',
+    path: '/change-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -101,8 +114,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/accounts': typeof AuthenticatedAccountsRoute
+  '/ai-summary': typeof AuthenticatedAiSummaryRoute
   '/booking-points': typeof AuthenticatedBookingPointsRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/change-history': typeof AuthenticatedChangeHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -116,8 +131,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/accounts': typeof AuthenticatedAccountsRoute
+  '/ai-summary': typeof AuthenticatedAiSummaryRoute
   '/booking-points': typeof AuthenticatedBookingPointsRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/change-history': typeof AuthenticatedChangeHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -133,8 +150,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/accounts': typeof AuthenticatedAccountsRoute
+  '/_authenticated/ai-summary': typeof AuthenticatedAiSummaryRoute
   '/_authenticated/booking-points': typeof AuthenticatedBookingPointsRoute
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/change-history': typeof AuthenticatedChangeHistoryRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/database': typeof AuthenticatedDatabaseRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
@@ -150,8 +169,10 @@ export interface FileRouteTypes {
     | '/'
     | '/reset-password'
     | '/accounts'
+    | '/ai-summary'
     | '/booking-points'
     | '/bookings'
+    | '/change-history'
     | '/dashboard'
     | '/database'
     | '/reports'
@@ -165,8 +186,10 @@ export interface FileRouteTypes {
     | '/'
     | '/reset-password'
     | '/accounts'
+    | '/ai-summary'
     | '/booking-points'
     | '/bookings'
+    | '/change-history'
     | '/dashboard'
     | '/database'
     | '/reports'
@@ -181,8 +204,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/reset-password'
     | '/_authenticated/accounts'
+    | '/_authenticated/ai-summary'
     | '/_authenticated/booking-points'
     | '/_authenticated/bookings'
+    | '/_authenticated/change-history'
     | '/_authenticated/dashboard'
     | '/_authenticated/database'
     | '/_authenticated/reports'
@@ -229,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai-summary': {
+      id: '/_authenticated/ai-summary'
+      path: '/ai-summary'
+      fullPath: '/ai-summary'
+      preLoaderRoute: typeof AuthenticatedAiSummaryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/booking-points': {
       id: '/_authenticated/booking-points'
       path: '/booking-points'
@@ -241,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/bookings'
       preLoaderRoute: typeof AuthenticatedBookingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/change-history': {
+      id: '/_authenticated/change-history'
+      path: '/change-history'
+      fullPath: '/change-history'
+      preLoaderRoute: typeof AuthenticatedChangeHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -304,8 +343,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountsRoute: typeof AuthenticatedAccountsRoute
+  AuthenticatedAiSummaryRoute: typeof AuthenticatedAiSummaryRoute
   AuthenticatedBookingPointsRoute: typeof AuthenticatedBookingPointsRoute
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedChangeHistoryRoute: typeof AuthenticatedChangeHistoryRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDatabaseRoute: typeof AuthenticatedDatabaseRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
@@ -318,8 +359,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountsRoute: AuthenticatedAccountsRoute,
+  AuthenticatedAiSummaryRoute: AuthenticatedAiSummaryRoute,
   AuthenticatedBookingPointsRoute: AuthenticatedBookingPointsRoute,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedChangeHistoryRoute: AuthenticatedChangeHistoryRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDatabaseRoute: AuthenticatedDatabaseRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
