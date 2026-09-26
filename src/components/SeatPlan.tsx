@@ -24,7 +24,7 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
         <div className="space-y-2">
           {rows.map((row) => (
             <div key={row.letter} className="flex items-center gap-1.5">
-              <span className="w-5 text-center text-[11px] font-semibold text-muted-foreground">
+              <span className="w-6 text-center text-[11px] font-semibold text-muted-foreground">
                 {row.letter}
               </span>
               {row.seats.map((seat, idx) => {
