@@ -302,7 +302,7 @@ function SeatBookingPage() {
       const { data } = await supabase
         .from("change_log")
         .select("*")
-        .eq("entity_type", "trip")
+        .eq("entity_type", "trips")
         .order("created_at", { ascending: false })
         .limit(500);
       return data ?? [];
