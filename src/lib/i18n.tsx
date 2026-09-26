@@ -29,6 +29,8 @@ const dict = {
   vehicles: { bn: "গাড়ি নাম্বার এড", en: "Add Vehicle Number" },
   bookingPoints: { bn: "বুকিং পয়েন্ট", en: "Booking Points" },
   scheduleBoard: { bn: "শিডিউল বোর্ড", en: "Schedule Board" },
+  changeHistory: { bn: "পরিবর্তনের ইতিহাস", en: "Change History" },
+  aiSummary: { bn: "AI সারসংক্ষেপ", en: "AI Summary" },
   accounts: { bn: "একাউন্ট ব্যবস্থাপনা", en: "Account Management" },
   vehicleNumber: { bn: "গাড়ির নাম্বার", en: "Vehicle Number" },
   vehicleType: { bn: "গাড়ির ধরন", en: "Vehicle Type" },
