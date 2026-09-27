@@ -25,7 +25,7 @@ export const createStaffAccount = createServerFn({ method: "POST" })
     if (!loginId) throw new Error("Invalid ID");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.createUser({
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: staffEmail(data.role, loginId),
       password: staffPassword(loginId, data.pin),
       email_confirm: true,
@@ -37,6 +37,18 @@ export const createStaffAccount = createServerFn({ method: "POST" })
       },
     });
     if (error) throw new Error(error.message);
+    const uid = created.user.id;
+    // No signup trigger exists, so write profile + role rows directly.
+    await supabaseAdmin.from("profiles").upsert({
+      id: uid,
+      name: data.name.trim(),
+      login_id: loginId,
+      email: created.user.email ?? null,
+      booking_point_id: data.bookingPointId ?? null,
+    });
+    const { data: hasRole } = await supabaseAdmin
+      .from("user_roles").select("id").eq("user_id", uid).maybeSingle();
+    if (!hasRole) await supabaseAdmin.from("user_roles").insert({ user_id: uid, role: data.role });
     return { ok: true };
   });
 
