@@ -47,7 +47,7 @@ export const ensureProfile = createServerFn({ method: "POST" })
       const role =
         !count || count === 0
           ? "master_admin"
-          : metaRole === "moderator" || metaRole === "booking_point" || metaRole === "master_admin"
+          : metaRole === "moderator" || metaRole === "booking_point"
             ? metaRole
             : "booking_point";
 
