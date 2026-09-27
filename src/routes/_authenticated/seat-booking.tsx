@@ -39,13 +39,14 @@ export const Route = createFileRoute("/_authenticated/seat-booking")({
   component: SeatBookingPage,
 });
 
+// লাল, নীল, হলুদ, সবুজ, বেগুনি, আকাশী, কমলা, মেরুন, বোটল গ্রীন, আফলাতুন, তার্কিজ, মেজেন্টা
 const POINT_COLORS = [
-  "hsl(0 75% 50%)", "hsl(215 80% 50%)", "hsl(140 60% 38%)", "hsl(30 90% 50%)",
-  "hsl(280 60% 50%)", "hsl(180 70% 35%)", "hsl(330 75% 50%)", "hsl(50 90% 42%)",
-  "hsl(260 30% 35%)", "hsl(15 60% 35%)", "hsl(95 55% 40%)", "hsl(200 90% 40%)",
+  "#e11d2a", "#1d4ed8", "#d4a106", "#16a34a", "#7c3aed", "#0ea5e9",
+  "#f97316", "#800000", "#006a4e", "#b57edc", "#14b8a6", "#d6008f",
+  "#4b5563", "#a16207", "#1e3a8a", "#65a30d",
 ];
 function pointColor(id: string, points: { id: string }[]) {
-  const sorted = [...points].map((p) => p.id).sort();
+  const sorted = [...new Set(points.map((p) => p.id))].sort();
   let i = sorted.indexOf(id);
   if (i < 0) i = [...id].reduce((a, c) => a + c.charCodeAt(0), 0);
   return POINT_COLORS[i % POINT_COLORS.length];
@@ -81,7 +82,7 @@ function SeatBookingPage() {
     queryFn: async () => (await supabase.from("supervisors").select("id, name")).data ?? [],
   });
   const { data: points } = useQuery({
-    queryKey: ["booking_points"],
+    queryKey: ["booking_points", "seat-colors"],
     queryFn: async () =>
       (await supabase.from("booking_points").select("id, name, point_type")).data ?? [],
   });

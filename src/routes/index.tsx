@@ -192,7 +192,6 @@ function MasterAdminForm() {
 function StaffForm({ role }: { role: StaffRole }) {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
   const [loginId, setLoginId] = useState("");
   const [pin, setPin] = useState("");
   const [busy, setBusy] = useState(false);
@@ -206,19 +205,7 @@ function StaffForm({ role }: { role: StaffRole }) {
         email: staffEmail(role, id),
         password: staffPassword(id, pin),
       });
-      if (error) throw new Error(t("nameMismatch"));
-
-      const { data: userData } = await supabase.auth.getUser();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("name")
-        .eq("id", userData.user?.id ?? "")
-        .maybeSingle();
-
-      if ((profile?.name ?? "").trim().toLowerCase() !== name.trim().toLowerCase()) {
-        await supabase.auth.signOut();
-        throw new Error(t("nameMismatch"));
-      }
+      if (error) throw new Error("আইডি বা পিন সঠিক নয় / Invalid ID or PIN");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error");
@@ -229,16 +216,6 @@ function StaffForm({ role }: { role: StaffRole }) {
 
   return (
     <form onSubmit={submit} className="panel mt-4 space-y-4 p-6">
-      <div className="space-y-1.5">
-        <Label htmlFor={`${role}-name`}>{t("name")}</Label>
-        <Input
-          id={`${role}-name`}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          maxLength={80}
-        />
-      </div>
       <div className="space-y-1.5">
         <Label htmlFor={`${role}-id`}>{t("loginId")}</Label>
         <Input
