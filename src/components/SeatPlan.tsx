@@ -27,10 +27,10 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
               {row.seats.map((seat, idx) => {
                 const booked = bookedMap.get(seat);
                 const isSelected = selected.includes(seat);
-                const isBackRow = row.seats.length === 5 && row.seats[2]?.endsWith("5");
+                const isBackRow = row.seats.length === 5;
                 const column = row.letter === "EX" ? 1 : isBackRow
                   ? [1, 2, 4, 5, 6][idx]
-                  : [1, 2, 5, 6, 4][idx];
+                  : [1, 2, 5, 6][idx];
                 return (
                     <Button
                       key={seat}

@@ -17,7 +17,7 @@ export function buildSeatRows(totalSeats: number): SeatRow[] {
         ),
       };
     });
-    rows.push({ letter: lastLetter, seats: [1, 2, 5, 3, 4].map((number) => `${lastLetter}${number}`) });
+    rows.push({ letter: lastLetter, seats: [1, 2, 3, 4, 5].map((number) => `${lastLetter}${number}`) });
     rows.unshift({ letter: "EX", seats: ["EX-1"] });
     return rows;
   }
