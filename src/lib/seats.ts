@@ -5,14 +5,14 @@ export type SeatRow = { letter: string; seats: string[] };
 /** Builds the bookable seats. The driver position is display-only. */
 export function buildSeatRows(totalSeats: number): SeatRow[] {
   const total = Math.max(1, Math.min(totalSeats || 44, 104));
-  if (total === 44 || total === 46) {
-    const lastLetter = total === 44 ? "J" : "K";
-    const regularRows = total === 44 ? 9 : 10;
+  if (total === 42 || total === 46) {
+    const lastLetter = total === 42 ? "J" : "K";
+    const regularRows = total === 42 ? 9 : 10;
     const rows = Array.from({ length: regularRows }, (_, index) => {
-      const letter = ROW_LETTERS[index];
+      const letter = String.fromCharCode(65 + index);
       return {
         letter,
-        seats: [1, 2, 3, 4, ...(total === 44 && (letter === "H" || letter === "I") ? [5] : [])].map(
+        seats: [1, 2, 3, 4].map(
           (number) => `${letter}${number}`,
         ),
       };
