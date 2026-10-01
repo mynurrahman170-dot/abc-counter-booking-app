@@ -2,13 +2,26 @@ const ROW_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 export type SeatRow = { letter: string; seats: string[] };
 
-/**
- * Builds a bus-style seat plan: rows of 4 seats (2 + aisle + 2).
- * If the total seat count is odd, the leftover single seat becomes an
- * "extra" seat placed at the very front, above row A (never at the back).
- */
+/** Builds the bookable seats. The driver position is display-only. */
 export function buildSeatRows(totalSeats: number): SeatRow[] {
   const total = Math.max(1, Math.min(totalSeats || 44, 104));
+  if (total === 42 || total === 46) {
+    const lastLetter = total === 42 ? "J" : "K";
+    const regularRows = total === 42 ? 9 : 10;
+    const rows = Array.from({ length: regularRows }, (_, index) => {
+      const letter = String.fromCharCode(65 + index);
+      return {
+        letter,
+        seats: [1, 2, 3, 4].map(
+          (number) => `${letter}${number}`,
+        ),
+      };
+    });
+    rows.push({ letter: lastLetter, seats: [1, 2, 3, 4, 5].map((number) => `${lastLetter}${number}`) });
+    rows.unshift({ letter: "EX", seats: ["EX-1"] });
+    return rows;
+  }
+
   const hasExtra = total % 2 === 1;
   const pairTotal = hasExtra ? total - 1 : total;
 

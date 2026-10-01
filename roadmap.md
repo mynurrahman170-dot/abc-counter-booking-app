@@ -1,0 +1,2 @@
+- [ ] Make the 42-seat plan A–I (four each), J1–J5, and EX-1; retain the photo-matched 46-seat plan and driver position.
+- [ ] Keep booking validation aligned with both layouts and verify seat counts and rendering.
