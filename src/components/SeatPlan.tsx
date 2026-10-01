@@ -40,7 +40,6 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
                       title={booked?.point}
                       onClick={() => onToggle(seat)}
                       disabled={Boolean(booked)}
-                      style={booked?.color ? { background: booked.color, borderColor: booked.color, color: "white" } : undefined}
                       className={`h-10 w-10 rounded-md border p-0 text-[10px] font-semibold transition-colors sm:w-12 sm:text-xs ${
                         booked
                           ? "cursor-not-allowed border-destructive bg-destructive text-destructive-foreground"
@@ -48,7 +47,7 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-input bg-background text-foreground hover:border-primary"
                       }`}
-                      {...(column ? { style: { ...(booked?.color ? { background: booked.color, borderColor: booked.color, color: "white" } : {}), gridColumn: column } } : {})}
+                      style={{ gridColumn: column, ...(booked?.color ? { background: booked.color, borderColor: booked.color, color: "white" } : {}) }}
                     >
                       {seat}
                     </Button>
