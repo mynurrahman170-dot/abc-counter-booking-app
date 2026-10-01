@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep 44/46-seat layout identifiers synchronized between `buildSeatRows` and the database seat-validation trigger, because bookings are checked independently of the visual plan.
