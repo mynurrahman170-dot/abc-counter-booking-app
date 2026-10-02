@@ -160,11 +160,13 @@ function SeatBookingPage() {
     return map;
   }, [locks, visibleByBooking, t, points]);
 
-  const legend = useMemo(() => {
-    const seen = new Map<string, { name: string; color: string }>();
-    for (const v of bookedMap.values()) if (v.color) seen.set(v.color, { name: v.point, color: v.color });
-    return [...seen.values()];
-  }, [bookedMap]);
+  const legend = useMemo(
+    () =>
+      [...(points ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((p) => ({ name: p.name, color: pointColor(p.id, points ?? []) })),
+    [points],
+  );
 
   const seatRows = useMemo(() => buildSeatRows(trip?.total_seats ?? 44), [trip?.total_seats]);
   const myTotal = (bookings ?? [])
@@ -393,7 +395,7 @@ function SeatBookingPage() {
               <option value="">{t("selectTrip")}</option>
               {filteredTrips.map((tr) => (
                 <option key={tr.id} value={tr.id}>
-                  {tr.departure_date} {tr.departure_time?.slice(0, 5)} ·{" "}
+                  {tr.departure_date} {tr.departure_time?.slice(0, 5)} · {tr.trip_direction === "down" ? t("downTrip") : t("upTrip")} ·{" "}
                   {tr.vehicles?.vehicle_number ?? "—"} · {tr.booking_points?.name ?? "—"}
                 </option>
               ))}
@@ -474,12 +476,15 @@ function SeatBookingPage() {
                 onToggle={toggleSeat}
               />
               {legend.length > 0 && (
-                <div className="mt-3 flex flex-wrap justify-center gap-3 text-xs">
-                  {legend.map((l) => (
-                    <span key={l.color} className="flex items-center gap-1.5">
-                      <span className="size-3 rounded-sm" style={{ background: l.color }} /> {l.name}
-                    </span>
-                  ))}
+                <div className="mt-4 rounded-md border border-border p-3">
+                  <p className="mb-2 text-center text-xs font-semibold">{t("colorGuide")}</p>
+                  <div className="flex flex-wrap justify-center gap-3 text-xs">
+                    {legend.map((l) => (
+                      <span key={l.name} className="flex items-center gap-1.5">
+                        <span className="size-4 rounded-sm border border-border" style={{ background: l.color }} /> {l.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -597,6 +602,7 @@ function TripForm({
     departure_date: new Date().toISOString().slice(0, 10),
     departure_time: "",
     fare: "",
+    trip_direction: "up",
   });
   const [mode, setMode] = useState<"manual" | "schedule">("manual");
   const [lookupNo, setLookupNo] = useState("");
@@ -638,6 +644,7 @@ function TripForm({
       route: sc.route ?? "",
       departure_time: sc.departure_time?.slice(0, 5) ?? "",
       fare: sc.fare != null ? String(sc.fare) : "",
+      trip_direction: sc.trip_direction === "down" ? "down" : "up",
     }));
     setLookupNo(sc.vehicles?.vehicle_number ?? lookupNo);
     toast.success(t("scheduleLoaded"));
@@ -662,6 +669,7 @@ function TripForm({
         departure_time: form.departure_time,
         total_seats: seatCount,
         fare: Number(form.fare) || 0,
+        trip_direction: form.trip_direction,
         created_by: session?.userId ?? null,
         schedule_id: sid,
       });
@@ -810,6 +818,13 @@ function TripForm({
           onChange={(e) => setForm({ ...form, departure_time: e.target.value })}
           required
         />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="tf-dir">{t("routeType")}</Label>
+        <select id="tf-dir" className={selectClass} value={form.trip_direction} onChange={(e) => setForm({ ...form, trip_direction: e.target.value })}>
+          <option value="up">{t("upTrip")}</option>
+          <option value="down">{t("downTrip")}</option>
+        </select>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="tf-fare">{t("fare")}</Label>
