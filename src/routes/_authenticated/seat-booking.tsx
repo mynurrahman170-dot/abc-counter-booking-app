@@ -620,7 +620,7 @@ function TripForm({
       (
         await supabase
           .from("schedules")
-          .select("id, vehicle_id, supervisor_id, route, departure_time, fare, vehicles(vehicle_number)")
+          .select("id, vehicle_id, supervisor_id, route, departure_time, fare, trip_direction, vehicles(vehicle_number)")
           .eq("departure_date", form.departure_date)
       ).data ?? [],
   });
