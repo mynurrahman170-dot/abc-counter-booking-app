@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Armchair, BarChart3, History, Sparkles, Bus, CalendarClock, LayoutDashboard, LogIn, LogOut, MapPin, Route as RouteIcon, Ticket, User, UserCog, Users } from "lucide-react";
+import { Calculator, Armchair, BarChart3, History, Sparkles, Bus, CalendarClock, LayoutDashboard, LogIn, LogOut, MapPin, Route as RouteIcon, Ticket, User, UserCog, Users } from "lucide-react";
 
 import {
   Sidebar,
@@ -29,6 +29,7 @@ const items: {
   { to: "/bookings", key: "bookingsList", icon: Ticket },
   { to: "/reports", key: "reports", icon: BarChart3 },
   { to: "/schedule", key: "scheduleBoard", icon: CalendarClock },
+  { to: "/reconcile", key: "reconcile", icon: Calculator },
   { to: "/vehicles", key: "vehicles", icon: Bus, roles: ["master_admin", "moderator"] },
   { to: "/routes", key: "routes", icon: RouteIcon },
   { to: "/booking-points", key: "bookingPoints", icon: MapPin, roles: ["master_admin", "moderator"] },
