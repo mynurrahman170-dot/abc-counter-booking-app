@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep 42/46-seat layout identifiers synchronized between `buildSeatRows` and the database seat-validation trigger, because bookings are checked independently of the visual plan.
+- Reserve New Bus Terminal's booked-seat color by its stable booking-point ID rather than a sorted position, because adding other points must not reassign that distinctive color.

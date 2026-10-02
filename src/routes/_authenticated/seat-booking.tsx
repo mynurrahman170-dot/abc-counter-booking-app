@@ -46,6 +46,8 @@ const POINT_COLORS = [
   "#4b5563", "#a16207", "#1e3a8a", "#65a30d",
 ];
 function pointColor(id: string, points: { id: string }[]) {
+  // Reserve an exclusive shade for New Bus Terminal, independent of sort order.
+  if (id === "b2a34c6f-2112-4908-8e57-836bbd8eda0a") return "var(--seat-new-terminal)";
   const sorted = [...new Set(points.map((p) => p.id))].sort();
   let i = sorted.indexOf(id);
   if (i < 0) i = [...id].reduce((a, c) => a + c.charCodeAt(0), 0);

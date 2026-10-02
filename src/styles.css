@@ -68,6 +68,7 @@
   --accent-foreground: oklch(0.18 0.05 245);
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0.01 245);
+  --seat-new-terminal: #be185d;
   --border: oklch(0.85 0.03 230);
   --input: oklch(0.9 0.02 230);
   --ring: oklch(0.55 0.14 233);

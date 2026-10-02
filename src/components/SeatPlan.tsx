@@ -42,7 +42,7 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
                       disabled={Boolean(booked)}
                       className={`h-10 w-10 rounded-md border p-0 text-[10px] font-semibold transition-colors sm:w-12 sm:text-xs ${
                         booked
-                          ? "cursor-not-allowed border-destructive bg-destructive text-destructive-foreground"
+                          ? "cursor-not-allowed border-destructive bg-destructive text-destructive-foreground disabled:opacity-100"
                           : isSelected
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-input bg-background text-foreground hover:border-primary"
