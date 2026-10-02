@@ -19,6 +19,7 @@ import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedChangeHistoryRouteImport } from './routes/_authenticated/change-history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDatabaseRouteImport } from './routes/_authenticated/database'
+import { Route as AuthenticatedReconcileRouteImport } from './routes/_authenticated/reconcile'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRoutesRouteImport } from './routes/_authenticated/routes'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
@@ -77,6 +78,11 @@ const AuthenticatedDatabaseRoute = AuthenticatedDatabaseRouteImport.update({
   path: '/database',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReconcileRoute = AuthenticatedReconcileRouteImport.update({
+  id: '/reconcile',
+  path: '/reconcile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/change-history': typeof AuthenticatedChangeHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
+  '/reconcile': typeof AuthenticatedReconcileRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/routes': typeof AuthenticatedRoutesRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/change-history': typeof AuthenticatedChangeHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
+  '/reconcile': typeof AuthenticatedReconcileRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/routes': typeof AuthenticatedRoutesRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/change-history': typeof AuthenticatedChangeHistoryRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/database': typeof AuthenticatedDatabaseRoute
+  '/_authenticated/reconcile': typeof AuthenticatedReconcileRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/routes': typeof AuthenticatedRoutesRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/change-history'
     | '/dashboard'
     | '/database'
+    | '/reconcile'
     | '/reports'
     | '/routes'
     | '/schedule'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/change-history'
     | '/dashboard'
     | '/database'
+    | '/reconcile'
     | '/reports'
     | '/routes'
     | '/schedule'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/change-history'
     | '/_authenticated/dashboard'
     | '/_authenticated/database'
+    | '/_authenticated/reconcile'
     | '/_authenticated/reports'
     | '/_authenticated/routes'
     | '/_authenticated/schedule'
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDatabaseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reconcile': {
+      id: '/_authenticated/reconcile'
+      path: '/reconcile'
+      fullPath: '/reconcile'
+      preLoaderRoute: typeof AuthenticatedReconcileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -349,6 +368,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChangeHistoryRoute: typeof AuthenticatedChangeHistoryRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDatabaseRoute: typeof AuthenticatedDatabaseRoute
+  AuthenticatedReconcileRoute: typeof AuthenticatedReconcileRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRoutesRoute: typeof AuthenticatedRoutesRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
@@ -365,6 +385,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChangeHistoryRoute: AuthenticatedChangeHistoryRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDatabaseRoute: AuthenticatedDatabaseRoute,
+  AuthenticatedReconcileRoute: AuthenticatedReconcileRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRoutesRoute: AuthenticatedRoutesRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,

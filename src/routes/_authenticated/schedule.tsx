@@ -48,6 +48,7 @@ function SchedulePage() {
     departure_date: "",
     departure_time: "",
     fare: "",
+    trip_direction: "up",
   });
 
   const { data: vehicles } = useQuery({
@@ -92,6 +93,7 @@ function SchedulePage() {
         departure_date: form.departure_date,
         departure_time: form.departure_time,
         fare: Number(form.fare) || 0,
+        trip_direction: form.trip_direction,
         created_by: session?.userId ?? null,
       });
       if (error) throw error;
@@ -219,6 +221,13 @@ function SchedulePage() {
           />
         </div>
         <div className="space-y-1.5">
+          <Label htmlFor="s-dir">{t("routeType")}</Label>
+          <select id="s-dir" className={selectClass} value={form.trip_direction} onChange={(e) => setForm({ ...form, trip_direction: e.target.value })}>
+            <option value="up">{t("upTrip")}</option>
+            <option value="down">{t("downTrip")}</option>
+          </select>
+        </div>
+        <div className="space-y-1.5">
           <Label htmlFor="s-fare">{t("fare")}</Label>
           <Input
             id="s-fare"
@@ -240,6 +249,7 @@ function SchedulePage() {
               <TableHead>{t("date")}</TableHead>
               <TableHead>{t("time")}</TableHead>
               <TableHead>{t("route")}</TableHead>
+              <TableHead>{t("routeType")}</TableHead>
               <TableHead>{t("vehicleNumber")}</TableHead>
               <TableHead>{t("supervisor")}</TableHead>
               <TableHead>{t("bookingPoint")}</TableHead>
@@ -250,12 +260,12 @@ function SchedulePage() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={8}>{t("loading")}</TableCell>
+                <TableCell colSpan={9}>{t("loading")}</TableCell>
               </TableRow>
             )}
             {!isLoading && (rows?.length ?? 0) === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="text-muted-foreground">
+                <TableCell colSpan={9} className="text-muted-foreground">
                   {t("noData")}
                 </TableCell>
               </TableRow>
@@ -265,6 +275,7 @@ function SchedulePage() {
                 <TableCell>{r.departure_date}</TableCell>
                 <TableCell className="font-semibold">{r.departure_time}</TableCell>
                 <TableCell>{r.route}</TableCell>
+                <TableCell>{r.trip_direction === "down" ? t("downTrip") : t("upTrip")}</TableCell>
                 <TableCell>{r.vehicles?.vehicle_number ?? "—"}</TableCell>
                 <TableCell>{r.supervisors?.name ?? "—"}</TableCell>
                 <TableCell>{r.booking_points?.name ?? "—"}</TableCell>
@@ -300,6 +311,16 @@ function SchedulePage() {
             type: "select",
             required: true,
             options: (routeList ?? []).map((r) => ({ value: r.name, label: r.name })),
+          },
+          {
+            key: "trip_direction",
+            label: t("routeType"),
+            type: "select",
+            required: true,
+            options: [
+              { value: "up", label: t("upTrip") },
+              { value: "down", label: t("downTrip") },
+            ],
           },
           {
             key: "supervisor_id",
