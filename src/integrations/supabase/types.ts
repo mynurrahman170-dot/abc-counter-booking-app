@@ -252,6 +252,7 @@ export type Database = {
           seats_available: number
           status: string
           supervisor_id: string | null
+          trip_direction: string
           vehicle_id: string | null
         }
         Insert: {
@@ -267,6 +268,7 @@ export type Database = {
           seats_available?: number
           status?: string
           supervisor_id?: string | null
+          trip_direction?: string
           vehicle_id?: string | null
         }
         Update: {
@@ -282,6 +284,7 @@ export type Database = {
           seats_available?: number
           status?: string
           supervisor_id?: string | null
+          trip_direction?: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -460,6 +463,7 @@ export type Database = {
           schedule_id: string | null
           supervisor_id: string | null
           total_seats: number
+          trip_direction: string
           updated_at: string
           vehicle_id: string | null
         }
@@ -476,6 +480,7 @@ export type Database = {
           schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
+          trip_direction?: string
           updated_at?: string
           vehicle_id?: string | null
         }
@@ -492,6 +497,7 @@ export type Database = {
           schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
+          trip_direction?: string
           updated_at?: string
           vehicle_id?: string | null
         }
