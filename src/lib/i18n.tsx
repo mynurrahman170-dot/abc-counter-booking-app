@@ -31,6 +31,7 @@ const dict = {
   scheduleBoard: { bn: "শিডিউল বোর্ড", en: "Schedule Board" },
   changeHistory: { bn: "পরিবর্তনের ইতিহাস", en: "Change History" },
   colorGuide: { bn: "বুকিং পয়েন্টের রঙের নির্দেশিকা", en: "Booking point color guide" },
+  all: { bn: "সব", en: "All" },
   upTrip: { bn: "আপ ট্রিপ", en: "Up trip" },
   downTrip: { bn: "ডাউন ট্রিপ", en: "Down trip" },
   routeType: { bn: "রুটের ধরন", en: "Route type" },

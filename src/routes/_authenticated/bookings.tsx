@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Pencil, Printer, XCircle } from "lucide-react";
 
@@ -61,6 +61,8 @@ function BookingsPage() {
   const today = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
+  const [dir, setDir] = useState<"all" | "up" | "down">("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [auditFor, setAuditFor] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [editRow, setEditRow] = useState<(Record<string, unknown> & { id: string }) | null>(null);
@@ -76,7 +78,7 @@ function BookingsPage() {
       let q = supabase
         .from("seat_bookings")
         .select(
-          "*, booking_points(name), trips(departure_date, departure_time, route, fare, vehicles(vehicle_number))",
+          "*, booking_points(name), trips(departure_date, departure_time, route, fare, trip_direction, vehicles(vehicle_number))",
         )
         .order("created_at", { ascending: false })
         .limit(500);
@@ -91,19 +93,42 @@ function BookingsPage() {
 
   const rows = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return bookings ?? [];
-    return (bookings ?? []).filter((b) =>
-      [
+    return (bookings ?? []).filter((b) => {
+      if (dir !== "all" && (b.trips?.trip_direction ?? "up") !== dir) return false;
+      if (statusFilter !== "all" && b.status !== statusFilter) return false;
+      if (!term) return true;
+      return [
         b.ticket_no,
         b.passenger_name,
         b.passenger_phone,
         b.booking_points?.name,
+        b.trips?.vehicles?.vehicle_number,
         (b.seat_numbers ?? []).join(","),
       ]
         .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(term)),
-    );
-  }, [bookings, search]);
+        .some((v) => String(v).toLowerCase().includes(term));
+    });
+  }, [bookings, search, dir, statusFilter]);
+
+  // Group bookings by vehicle so all bookings of one vehicle stay together.
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof rows>();
+    for (const b of rows) {
+      const vehicle = b.trips?.vehicles?.vehicle_number ?? "—";
+      const list = map.get(vehicle);
+      if (list) list.push(b);
+      else map.set(vehicle, [b]);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([vehicle, list]) => ({
+        vehicle,
+        list,
+        total: list
+          .filter((b) => b.status !== "cancelled")
+          .reduce((s, b) => s + Number(b.amount ?? 0), 0),
+      }));
+  }, [rows]);
 
   const cancel = useMutation({
     mutationFn: async (id: string) => {
@@ -160,6 +185,20 @@ function BookingsPage() {
             </select>
           </div>
         )}
+        <div className="space-y-1.5">
+          <Label htmlFor="bk-status">{t("status")}</Label>
+          <select
+            id="bk-status"
+            className={selectClass}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">{t("all")}</option>
+            <option value="pending">{t("pending")}</option>
+            <option value="confirmed">{t("confirmed")}</option>
+            <option value="cancelled">{t("cancelled")}</option>
+          </select>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
             <Label htmlFor="bk-from">{t("from")}</Label>
@@ -170,6 +209,19 @@ function BookingsPage() {
             <Input id="bk-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </div>
+      </div>
+
+      <div className="flex gap-2">
+        {(["all", "up", "down"] as const).map((d) => (
+          <Button
+            key={d}
+            variant={dir === d ? "default" : "outline"}
+            size="sm"
+            onClick={() => setDir(d)}
+          >
+            {d === "all" ? t("all") : d === "up" ? t("upTrip") : t("downTrip")}
+          </Button>
+        ))}
       </div>
 
       <div className="panel overflow-x-auto">
@@ -199,7 +251,17 @@ function BookingsPage() {
                 </TableCell>
               </TableRow>
             )}
-            {rows.map((b) => (
+            {groups.map((g) => (
+              <Fragment key={g.vehicle}>
+                <TableRow className="bg-muted/60">
+                  <TableCell colSpan={8} className="font-display text-sm uppercase tracking-wide">
+                    {t("vehicleNumber")}: <span className="font-bold">{g.vehicle}</span>
+                    <span className="ml-3 text-xs font-normal text-muted-foreground">
+                      {g.list.length} • ৳{g.total}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                {g.list.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-mono text-xs">{b.ticket_no ?? "—"}</TableCell>
                 <TableCell className="font-semibold">{b.booking_points?.name ?? "—"}</TableCell>
@@ -269,6 +331,8 @@ function BookingsPage() {
                   </Button>
                 </TableCell>
               </TableRow>
+                ))}
+              </Fragment>
             ))}
           </TableBody>
         </Table>
