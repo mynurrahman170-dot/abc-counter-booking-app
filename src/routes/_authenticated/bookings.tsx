@@ -185,6 +185,20 @@ function BookingsPage() {
             </select>
           </div>
         )}
+        <div className="space-y-1.5">
+          <Label htmlFor="bk-status">{t("status")}</Label>
+          <select
+            id="bk-status"
+            className={selectClass}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">{t("all")}</option>
+            <option value="pending">{t("pending")}</option>
+            <option value="confirmed">{t("confirmed")}</option>
+            <option value="cancelled">{t("cancelled")}</option>
+          </select>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
             <Label htmlFor="bk-from">{t("from")}</Label>
@@ -195,6 +209,19 @@ function BookingsPage() {
             <Input id="bk-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </div>
+      </div>
+
+      <div className="flex gap-2">
+        {(["all", "up", "down"] as const).map((d) => (
+          <Button
+            key={d}
+            variant={dir === d ? "default" : "outline"}
+            size="sm"
+            onClick={() => setDir(d)}
+          >
+            {d === "all" ? t("all") : d === "up" ? t("upTrip") : t("downTrip")}
+          </Button>
+        ))}
       </div>
 
       <div className="panel overflow-x-auto">
