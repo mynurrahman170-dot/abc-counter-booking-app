@@ -61,6 +61,8 @@ function BookingsPage() {
   const today = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
+  const [dir, setDir] = useState<"all" | "up" | "down">("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [auditFor, setAuditFor] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [editRow, setEditRow] = useState<(Record<string, unknown> & { id: string }) | null>(null);
@@ -76,7 +78,7 @@ function BookingsPage() {
       let q = supabase
         .from("seat_bookings")
         .select(
-          "*, booking_points(name), trips(departure_date, departure_time, route, fare, vehicles(vehicle_number))",
+          "*, booking_points(name), trips(departure_date, departure_time, route, fare, trip_direction, vehicles(vehicle_number))",
         )
         .order("created_at", { ascending: false })
         .limit(500);
