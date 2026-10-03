@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Pencil, Printer, XCircle } from "lucide-react";
 
@@ -331,6 +331,8 @@ function BookingsPage() {
                   </Button>
                 </TableCell>
               </TableRow>
+                ))}
+              </Fragment>
             ))}
           </TableBody>
         </Table>
