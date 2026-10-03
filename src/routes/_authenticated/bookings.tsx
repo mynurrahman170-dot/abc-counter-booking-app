@@ -251,7 +251,17 @@ function BookingsPage() {
                 </TableCell>
               </TableRow>
             )}
-            {rows.map((b) => (
+            {groups.map((g) => (
+              <Fragment key={g.vehicle}>
+                <TableRow className="bg-muted/60">
+                  <TableCell colSpan={8} className="font-display text-sm uppercase tracking-wide">
+                    {t("vehicleNumber")}: <span className="font-bold">{g.vehicle}</span>
+                    <span className="ml-3 text-xs font-normal text-muted-foreground">
+                      {g.list.length} • ৳{g.total}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                {g.list.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-mono text-xs">{b.ticket_no ?? "—"}</TableCell>
                 <TableCell className="font-semibold">{b.booking_points?.name ?? "—"}</TableCell>
