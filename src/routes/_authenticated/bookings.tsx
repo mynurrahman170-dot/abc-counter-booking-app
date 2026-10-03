@@ -58,8 +58,9 @@ function BookingsPage() {
 
   const [search, setSearch] = useState("");
   const [pointId, setPointId] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const today = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const [from, setFrom] = useState(today);
+  const [to, setTo] = useState(today);
   const [auditFor, setAuditFor] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [editRow, setEditRow] = useState<(Record<string, unknown> & { id: string }) | null>(null);
@@ -204,6 +205,9 @@ function BookingsPage() {
                 <TableCell className="font-semibold">{b.booking_points?.name ?? "—"}</TableCell>
                 <TableCell className="text-xs">
                   {b.trips?.departure_date} {b.trips?.departure_time?.slice(0, 5)}
+                  {b.trips?.vehicles?.vehicle_number ? (
+                    <span className="ml-2 font-semibold">{b.trips.vehicles.vehicle_number}</span>
+                  ) : null}
                   <br />
                   {b.trips?.route ?? "—"}
                 </TableCell>
