@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { RefreshCw, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -61,7 +61,7 @@ function ReconcilePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestDate]);
 
-  const { data: trips, isLoading } = useQuery({
+  const { data: trips, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["reconcile", from, to],
     enabled: Boolean(from || to),
     queryFn: async () => {
@@ -107,7 +107,13 @@ function ReconcilePage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <h1 className="font-display text-3xl uppercase tracking-wide">{t("reconcile")}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-3xl uppercase tracking-wide">{t("reconcile")}</h1>
+        <Button type="button" disabled={isFetching} onClick={() => void refetch()}>
+          <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+          {t("updateCombined")}
+        </Button>
+      </div>
 
       <div className="panel grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
