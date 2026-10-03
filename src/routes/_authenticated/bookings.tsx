@@ -93,19 +93,42 @@ function BookingsPage() {
 
   const rows = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return bookings ?? [];
-    return (bookings ?? []).filter((b) =>
-      [
+    return (bookings ?? []).filter((b) => {
+      if (dir !== "all" && (b.trips?.trip_direction ?? "up") !== dir) return false;
+      if (statusFilter !== "all" && b.status !== statusFilter) return false;
+      if (!term) return true;
+      return [
         b.ticket_no,
         b.passenger_name,
         b.passenger_phone,
         b.booking_points?.name,
+        b.trips?.vehicles?.vehicle_number,
         (b.seat_numbers ?? []).join(","),
       ]
         .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(term)),
-    );
-  }, [bookings, search]);
+        .some((v) => String(v).toLowerCase().includes(term));
+    });
+  }, [bookings, search, dir, statusFilter]);
+
+  // Group bookings by vehicle so all bookings of one vehicle stay together.
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof rows>();
+    for (const b of rows) {
+      const vehicle = b.trips?.vehicles?.vehicle_number ?? "—";
+      const list = map.get(vehicle);
+      if (list) list.push(b);
+      else map.set(vehicle, [b]);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([vehicle, list]) => ({
+        vehicle,
+        list,
+        total: list
+          .filter((b) => b.status !== "cancelled")
+          .reduce((s, b) => s + Number(b.amount ?? 0), 0),
+      }));
+  }, [rows]);
 
   const cancel = useMutation({
     mutationFn: async (id: string) => {
