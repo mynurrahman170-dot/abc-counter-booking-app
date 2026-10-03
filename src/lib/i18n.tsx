@@ -126,7 +126,6 @@ const dict = {
   guest: { bn: "অতিথি", en: "Guest" },
   routes: { bn: "রুট এড", en: "Add Route" },
   addRoute: { bn: "রুট যোগ করুন", en: "Add Route" },
-  routeName: { bn: "রুটের নাম", en: "Route Name" },
   fromPlace: { bn: "কোথা থেকে", en: "From" },
   toPlace: { bn: "কোথায়", en: "To" },
   confirmBooking: { bn: "বুকিং কনফার্ম করুন", en: "Confirm Booking" },
