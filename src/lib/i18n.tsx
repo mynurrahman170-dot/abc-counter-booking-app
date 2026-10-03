@@ -230,6 +230,7 @@ const dict = {
   codeUpdated: { bn: "গোপন কোড আপডেট হয়েছে", en: "Secret code updated" },
   live: { bn: "লাইভ", en: "Live" },
   cancelBooking: { bn: "বুকিং বাতিল", en: "Cancel booking" },
+  updateCombined: { bn: "সমন্বিত জমা আপডেট", en: "Update combined total" },
   seatsReleased: { bn: "সিট আবার খালি করা হয়েছে", en: "Seats released" },
   tripFull: { bn: "এই ট্রিপে আর সিট খালি নেই", en: "No seats left on this trip" },
   invalidSeat: { bn: "সিট নির্বাচন সঠিক নয়", en: "Invalid seat selection" },

@@ -318,13 +318,16 @@ function BookingsPage() {
                     <Printer className="size-4" />
                   </Button>
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="outline"
+                    size="sm"
                     title={t("cancelSeats")}
                     disabled={b.status === "cancelled" || cancel.isPending}
-                    onClick={() => cancel.mutate(b.id)}
+                    onClick={() => {
+                      if (window.confirm(t("cancelBooking") + "?")) cancel.mutate(b.id);
+                    }}
                   >
                     <XCircle className="size-4 text-destructive" />
+                    {t("cancelBooking")}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => setAuditFor(b.id)}>
                     {t("auditTrail")}

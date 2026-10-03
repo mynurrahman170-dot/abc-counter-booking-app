@@ -68,18 +68,27 @@ function SchedulePage() {
     queryFn: async () => (await supabase.from("supervisors").select("id, name").order("name")).data ?? [],
   });
 
-  const { data: rows, isLoading } = useQuery({
-    queryKey: ["schedules"],
+  const today = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const [viewDate, setViewDate] = useState(today);
+  const [dir, setDir] = useState<"up" | "down">("up");
+
+  const { data: allRows, isLoading } = useQuery({
+    queryKey: ["schedules", viewDate],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("schedules")
         .select("*, vehicles(vehicle_number), booking_points(name), supervisors(name)")
         .order("departure_date", { ascending: true })
         .order("departure_time", { ascending: true });
+      if (viewDate) q = q.eq("departure_date", viewDate);
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },
   });
+  const rows = (allRows ?? []).filter((r) => (r.trip_direction === "down" ? "down" : "up") === dir);
+  const countUp = (allRows ?? []).filter((r) => r.trip_direction !== "down").length;
+  const countDown = (allRows?.length ?? 0) - countUp;
 
   const create = useMutation({
     mutationFn: async () => {
@@ -241,6 +250,21 @@ function SchedulePage() {
           {t("add")}
         </Button>
       </form>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="s-view-date">{t("date")}</Label>
+          <Input id="s-view-date" type="date" value={viewDate} onChange={(e) => setViewDate(e.target.value)} />
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" variant={dir === "up" ? "default" : "outline"} onClick={() => setDir("up")}>
+            {t("upTrip")} ({countUp})
+          </Button>
+          <Button type="button" variant={dir === "down" ? "default" : "outline"} onClick={() => setDir("down")}>
+            {t("downTrip")} ({countDown})
+          </Button>
+        </div>
+      </div>
 
       <div className="panel overflow-x-auto">
         <Table>
