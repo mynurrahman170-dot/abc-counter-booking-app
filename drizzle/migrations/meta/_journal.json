@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791132280664,
+      "tag": "0000_trip_seq_night_hold",
+      "breakpoints": true
+    }
+  ]
+}
