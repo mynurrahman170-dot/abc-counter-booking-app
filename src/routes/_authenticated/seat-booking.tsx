@@ -396,7 +396,7 @@ function SeatBookingPage() {
               {filteredTrips.map((tr) => (
                 <option key={tr.id} value={tr.id} style={tr.trip_seq > 1 ? { color: "var(--destructive)" } : undefined}>
                   {tr.departure_date} {tr.departure_time?.slice(0, 5)} · {tr.trip_direction === "down" ? t("downTrip") : t("upTrip")} ·{" "}
-                  {tr.vehicles?.vehicle_number ?? "—"}{tr.trip_seq > 1 ? ` (${tr.trip_seq}য় ট্রিপ)` : ""}{tr.night_hold ? " · নাইট হোল্ড" : ""} · {tr.booking_points?.name ?? "—"}
+                  {tr.vehicles?.vehicle_number ?? "—"}{tr.trip_seq > 1 ? ` (${["", "", "২য়", "৩য়", "৪র্থ", "৫ম"][tr.trip_seq] ?? tr.trip_seq} ট্রিপ)` : ""}{tr.night_hold ? " · নাইট হোল্ড" : ""} · {tr.booking_points?.name ?? "—"}
                 </option>
               ))}
             </select>
