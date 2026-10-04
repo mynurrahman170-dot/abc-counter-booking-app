@@ -49,6 +49,7 @@ function SchedulePage() {
     departure_time: "",
     fare: "",
     trip_direction: "up",
+    night_hold: false,
   });
 
   const { data: vehicles } = useQuery({
@@ -92,11 +93,12 @@ function SchedulePage() {
 
   const create = useMutation({
     mutationFn: async () => {
-      const bookingPointId = isStaff ? form.booking_point_id : (session?.bookingPointId ?? "");
-      if (!bookingPointId) throw new Error(t("select") + ": " + t("bookingPoint"));
+      const bookingPointId = session?.bookingPointId ?? null;
+      if (!bookingPointId && !isStaff) throw new Error(t("noBookingPointLinked"));
       const { error } = await supabase.from("schedules").insert({
         vehicle_id: form.vehicle_id || null,
         booking_point_id: bookingPointId,
+        night_hold: form.trip_direction === "up" && form.night_hold,
         route: form.route.trim(),
         supervisor_id: form.supervisor_id || null,
         departure_date: form.departure_date,
@@ -157,25 +159,14 @@ function SchedulePage() {
             ))}
           </select>
         </div>
-        {isStaff && (
-          <div className="space-y-1.5">
-            <Label htmlFor="s-point">{t("bookingPoint")}</Label>
-            <select
-              id="s-point"
-              className={selectClass}
-              value={form.booking_point_id}
-              onChange={(e) => setForm({ ...form, booking_point_id: e.target.value })}
-              required
-            >
-              <option value="">{t("select")}</option>
-              {points?.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <label className="flex items-center gap-2 self-end pb-2 text-sm">
+          <input
+            type="checkbox"
+            checked={form.night_hold}
+            onChange={(e) => setForm({ ...form, night_hold: e.target.checked })}
+          />
+          নাইট হোল্ড ট্রিপ
+        </label>
         <div className="space-y-1.5">
           <Label htmlFor="s-route">{t("route")}</Label>
           <select
@@ -276,7 +267,7 @@ function SchedulePage() {
               <TableHead>{t("routeType")}</TableHead>
               <TableHead>{t("vehicleNumber")}</TableHead>
               <TableHead>{t("supervisor")}</TableHead>
-              <TableHead>{t("bookingPoint")}</TableHead>
+              <TableHead>নাইট হোল্ড</TableHead>
               <TableHead>{t("fare")}</TableHead>
               <TableHead className="text-right">{t("actions")}</TableHead>
             </TableRow>
@@ -302,7 +293,7 @@ function SchedulePage() {
                 <TableCell>{r.trip_direction === "down" ? t("downTrip") : t("upTrip")}</TableCell>
                 <TableCell>{r.vehicles?.vehicle_number ?? "—"}</TableCell>
                 <TableCell>{r.supervisors?.name ?? "—"}</TableCell>
-                <TableCell>{r.booking_points?.name ?? "—"}</TableCell>
+                <TableCell>{r.night_hold ? "✓" : "—"}</TableCell>
                 <TableCell>{r.fare}</TableCell>
                 <TableCell className="space-x-1 text-right">
                   <Button
