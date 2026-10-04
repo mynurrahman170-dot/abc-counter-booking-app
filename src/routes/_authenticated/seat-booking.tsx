@@ -394,9 +394,9 @@ function SeatBookingPage() {
             >
               <option value="">{t("selectTrip")}</option>
               {filteredTrips.map((tr) => (
-                <option key={tr.id} value={tr.id}>
+                <option key={tr.id} value={tr.id} style={tr.trip_seq > 1 ? { color: "var(--destructive)" } : undefined}>
                   {tr.departure_date} {tr.departure_time?.slice(0, 5)} · {tr.trip_direction === "down" ? t("downTrip") : t("upTrip")} ·{" "}
-                  {tr.vehicles?.vehicle_number ?? "—"} · {tr.booking_points?.name ?? "—"}
+                  {tr.vehicles?.vehicle_number ?? "—"}{tr.trip_seq > 1 ? ` (${tr.trip_seq}য় ট্রিপ)` : ""}{tr.night_hold ? " · নাইট হোল্ড" : ""} · {tr.booking_points?.name ?? "—"}
                 </option>
               ))}
             </select>
@@ -603,6 +603,7 @@ function TripForm({
     departure_time: "",
     fare: "",
     trip_direction: "up",
+    night_hold: false,
   });
   const [mode, setMode] = useState<"manual" | "schedule">("manual");
   const [lookupNo, setLookupNo] = useState("");
@@ -625,7 +626,7 @@ function TripForm({
       (
         await supabase
           .from("schedules")
-          .select("id, vehicle_id, supervisor_id, route, departure_time, fare, trip_direction, vehicles(vehicle_number)")
+          .select("id, vehicle_id, supervisor_id, route, departure_time, fare, trip_direction, night_hold, vehicles(vehicle_number)")
           .eq("departure_date", form.departure_date)
       ).data ?? [],
   });
@@ -650,6 +651,7 @@ function TripForm({
       departure_time: sc.departure_time?.slice(0, 5) ?? "",
       fare: sc.fare != null ? String(sc.fare) : "",
       trip_direction: sc.trip_direction === "down" ? "down" : "up",
+      night_hold: Boolean(sc.night_hold),
     }));
     setLookupNo(sc.vehicles?.vehicle_number ?? lookupNo);
     toast.success(t("scheduleLoaded"));
@@ -664,6 +666,23 @@ function TripForm({
         const { data: dup } = await supabase.from("trips").select("id").eq("schedule_id", sid).limit(1);
         if (dup && dup.length) throw new Error(t("scheduleTripExists"));
       }
+      let seq = 1;
+      if (form.vehicle_id) {
+        const { count } = await supabase
+          .from("trips")
+          .select("id", { count: "exact", head: true })
+          .eq("vehicle_id", form.vehicle_id)
+          .eq("departure_date", form.departure_date)
+          .eq("trip_direction", form.trip_direction);
+        seq = (count ?? 0) + 1;
+        if (seq > 1) {
+          const vno = vehicles.find((v) => v.id === form.vehicle_id)?.vehicle_number ?? "";
+          const ord = ["", "১ম", "২য়", "৩য়", "৪র্থ", "৫ম", "৬ষ্ঠ"][seq] ?? `${seq}তম`;
+          if (!window.confirm(`আপনি কি ${vno} গাড়ির ${ord} বার ট্রিপ তৈরি করতে চান?`)) {
+            throw new Error("বাতিল করা হয়েছে");
+          }
+        }
+      }
       const seatCount = vehicles.find((v) => v.id === form.vehicle_id)?.seat_count || 44;
       const { error } = await supabase.from("trips").insert({
         vehicle_id: form.vehicle_id || null,
@@ -677,6 +696,8 @@ function TripForm({
         trip_direction: form.trip_direction,
         created_by: session?.userId ?? null,
         schedule_id: sid,
+        trip_seq: seq,
+        night_hold: form.trip_direction === "up" && form.night_hold,
       });
       if (error) {
         if (error.code === "23505") throw new Error(t("scheduleTripExists"));
@@ -841,6 +862,12 @@ function TripForm({
           <option value="down">{t("downTrip")}</option>
         </select>
       </div>
+      {form.trip_direction === "up" && (
+        <label className="flex items-center gap-2 self-end pb-2 text-sm">
+          <input type="checkbox" checked={form.night_hold} onChange={(e) => setForm({ ...form, night_hold: e.target.checked })} />
+          নাইট হোল্ড ট্রিপ
+        </label>
+      )}
       <div className="space-y-1.5">
         <Label htmlFor="tf-fare">{t("fare")}</Label>
         <Input
