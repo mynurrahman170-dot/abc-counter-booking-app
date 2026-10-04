@@ -607,6 +607,11 @@ function TripForm({
   const [mode, setMode] = useState<"manual" | "schedule">("manual");
   const [lookupNo, setLookupNo] = useState("");
   const [scheduleId, setScheduleId] = useState<string | null>(null);
+  const { data: routes } = useQuery({
+    queryKey: ["routes"],
+    queryFn: async () =>
+      (await supabase.from("routes").select("id, name").order("name", { ascending: true })).data ?? [],
+  });
   const { data: usedSchedules } = useQuery({
     queryKey: ["trips", "schedule-ids"],
     enabled: mode === "schedule",
