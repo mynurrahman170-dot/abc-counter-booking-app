@@ -797,12 +797,22 @@ function TripForm({
       )}
       <div className="space-y-1.5">
         <Label htmlFor="tf-route">{t("route")}</Label>
-        <Input
+        <select
           id="tf-route"
+          className={selectClass}
           value={form.route}
           onChange={(e) => setForm({ ...form, route: e.target.value })}
-          maxLength={120}
-        />
+        >
+          <option value="">{t("select")}</option>
+          {(routes ?? []).map((r) => (
+            <option key={r.id} value={r.name}>
+              {r.name}
+            </option>
+          ))}
+          {form.route && !(routes ?? []).some((r) => r.name === form.route) && (
+            <option value={form.route}>{form.route}</option>
+          )}
+        </select>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="tf-date">{t("date")}</Label>
