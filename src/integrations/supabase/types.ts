@@ -247,6 +247,7 @@ export type Database = {
           departure_time: string
           fare: number
           id: string
+          night_hold: boolean
           note: string | null
           route: string
           seats_available: number
@@ -263,6 +264,7 @@ export type Database = {
           departure_time: string
           fare?: number
           id?: string
+          night_hold?: boolean
           note?: string | null
           route: string
           seats_available?: number
@@ -279,6 +281,7 @@ export type Database = {
           departure_time?: string
           fare?: number
           id?: string
+          night_hold?: boolean
           note?: string | null
           route?: string
           seats_available?: number
@@ -458,12 +461,14 @@ export type Database = {
           fare: number
           id: string
           master_point_id: string | null
+          night_hold: boolean
           route: string | null
           route_id: string | null
           schedule_id: string | null
           supervisor_id: string | null
           total_seats: number
           trip_direction: string
+          trip_seq: number
           updated_at: string
           vehicle_id: string | null
         }
@@ -475,12 +480,14 @@ export type Database = {
           fare?: number
           id?: string
           master_point_id?: string | null
+          night_hold?: boolean
           route?: string | null
           route_id?: string | null
           schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
           trip_direction?: string
+          trip_seq?: number
           updated_at?: string
           vehicle_id?: string | null
         }
@@ -492,12 +499,14 @@ export type Database = {
           fare?: number
           id?: string
           master_point_id?: string | null
+          night_hold?: boolean
           route?: string | null
           route_id?: string | null
           schedule_id?: string | null
           supervisor_id?: string | null
           total_seats?: number
           trip_direction?: string
+          trip_seq?: number
           updated_at?: string
           vehicle_id?: string | null
         }
