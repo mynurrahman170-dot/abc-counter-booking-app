@@ -8,6 +8,13 @@
       "when": 1791132280664,
       "tag": "0000_trip_seq_night_hold",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791164070686,
+      "tag": "0001_point_color_destination",
+      "breakpoints": true
     }
   ]
 }
