@@ -18,7 +18,7 @@ import {
 export type EditField = {
   key: string;
   label: string;
-  type?: "text" | "number" | "date" | "time" | "select";
+  type?: "text" | "number" | "date" | "time" | "select" | "color";
   options?: { value: string; label: string }[];
   required?: boolean;
   maxLength?: number;
@@ -109,6 +109,15 @@ export function EditRowDialog({
                   ))}
                 </select>
               ) : (
+                f.type === "color" ? (
+                <input
+                  id={`edit-${f.key}`}
+                  type="color"
+                  className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
+                  value={values[f.key] || "#888888"}
+                  onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+                />
+                ) : (
                 <Input
                   id={`edit-${f.key}`}
                   type={f.type ?? "text"}
@@ -117,6 +126,7 @@ export function EditRowDialog({
                   value={values[f.key] ?? ""}
                   onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
                 />
+                )
               )}
             </div>
           ))}

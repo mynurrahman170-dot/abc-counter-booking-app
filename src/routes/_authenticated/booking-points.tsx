@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/booking-points")({
 function BookingPointsPage() {
   const { t } = useI18n();
   const qc = useQueryClient();
-  const [form, setForm] = useState({ name: "", code: "", address: "", phone: "", point_type: "normal" });
+  const [form, setForm] = useState({ name: "", code: "", address: "", phone: "", point_type: "normal", seat_color: "#e11d2a" });
   const [editRow, setEditRow] = useState<Record<string, unknown> & { id: string } | null>(null);
 
   const { data: rows, isLoading } = useQuery({
@@ -62,12 +62,13 @@ function BookingPointsPage() {
         address: form.address.trim() || null,
         phone: form.phone.trim() || null,
         point_type: form.point_type,
+        seat_color: form.seat_color,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success(t("saved"));
-      setForm({ name: "", code: "", address: "", phone: "", point_type: "normal" });
+      setForm({ name: "", code: "", address: "", phone: "", point_type: "normal", seat_color: "#e11d2a" });
       void qc.invalidateQueries({ queryKey: ["booking_points"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -146,6 +147,16 @@ function BookingPointsPage() {
             <option value="master">{t("masterPoint")}</option>
           </select>
         </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bp-color">{t("seatColor")}</Label>
+          <input
+            id="bp-color"
+            type="color"
+            className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
+            value={form.seat_color}
+            onChange={(e) => setForm({ ...form, seat_color: e.target.value })}
+          />
+        </div>
         <Button type="submit" disabled={create.isPending} className="sm:col-span-2 lg:col-span-1">
           {t("add")}
         </Button>
@@ -178,7 +189,12 @@ function BookingPointsPage() {
             )}
             {rows?.map((r) => (
               <TableRow key={r.id}>
-                <TableCell className="font-semibold">{r.name}</TableCell>
+                <TableCell className="font-semibold">
+                  <span className="flex items-center gap-2">
+                    <span className="size-4 shrink-0 rounded-sm border border-border" style={{ background: r.seat_color ?? undefined }} />
+                    {r.name}
+                  </span>
+                </TableCell>
                 <TableCell>{r.code}</TableCell>
                 <TableCell>{r.address ?? "—"}</TableCell>
                 <TableCell>{r.phone ?? "—"}</TableCell>
@@ -215,6 +231,7 @@ function BookingPointsPage() {
           { key: "code", label: t("code"), required: true, maxLength: 30 },
           { key: "address", label: t("address"), maxLength: 200 },
           { key: "phone", label: t("phone"), maxLength: 30 },
+          { key: "seat_color", label: t("seatColor"), type: "color" },
           {
             key: "point_type",
             label: t("pointType"),

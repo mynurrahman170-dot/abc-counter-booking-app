@@ -13,6 +13,7 @@ export type TicketData = {
   seats: string[];
   passengerName: string;
   passengerPhone: string;
+  destination?: string;
   farePerSeat: number;
   amount: number;
 };
@@ -37,17 +38,19 @@ export function TicketDialog({
     [t("seats"), ticket.seats.join(", ")],
     [t("passengerName"), ticket.passengerName || "—"],
     [t("passengerPhone"), ticket.passengerPhone || "—"],
+    [t("destination"), ticket.destination || "—"],
     [t("farePerSeat"), `৳${ticket.farePerSeat}`],
   ];
 
   function print() {
     if (!ticket) return;
-    const body = `<div class="ticket"><h1>${escapeHtml(t("appName"))}</h1>
-      <p class="muted">${escapeHtml(t("ticketReceipt"))}</p>
+    const copy = (label: string) => `<div class="ticket"><h1>${escapeHtml(t("appName"))}</h1>
+      <div class="copy">${escapeHtml(label)}</div>
       ${rows.map(([k, v]) => `<div class="row"><span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong></div>`).join("")}
       <div class="row total"><span>${escapeHtml(t("totalAmount"))}</span><span>৳${escapeHtml(ticket.amount)}</span></div>
     </div>`;
-    printDocument(`${t("ticketReceipt")} ${ticket.ticketNo}`, body);
+    const body = `${copy(t("passengerCopy"))}<div class="cut">✂ - - - - - - - - - - - -</div>${copy(t("officeCopy"))}`;
+    printDocument(`${t("ticketReceipt")} ${ticket.ticketNo}`, body, { pos: true });
   }
 
   return (

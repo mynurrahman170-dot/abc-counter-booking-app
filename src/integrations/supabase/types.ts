@@ -56,6 +56,7 @@ export type Database = {
           name: string
           phone: string | null
           point_type: string
+          seat_color: string | null
         }
         Insert: {
           address?: string | null
@@ -65,6 +66,7 @@ export type Database = {
           name: string
           phone?: string | null
           point_type?: string
+          seat_color?: string | null
         }
         Update: {
           address?: string | null
@@ -74,6 +76,7 @@ export type Database = {
           name?: string
           phone?: string | null
           point_type?: string
+          seat_color?: string | null
         }
         Relationships: []
       }
@@ -322,6 +325,7 @@ export type Database = {
           cancelled_by: string | null
           created_at: string
           created_by: string | null
+          destination: string | null
           fare_per_seat: number
           id: string
           note: string | null
@@ -340,6 +344,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           created_by?: string | null
+          destination?: string | null
           fare_per_seat?: number
           id?: string
           note?: string | null
@@ -358,6 +363,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           created_by?: string | null
+          destination?: string | null
           fare_per_seat?: number
           id?: string
           note?: string | null

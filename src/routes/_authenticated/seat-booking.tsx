@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Trash2, XCircle } from "lucide-react";
+import { Pencil, Printer, Trash2, XCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EditRowDialog } from "@/components/EditRowDialog";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -45,7 +47,9 @@ const POINT_COLORS = [
   "#f97316", "#800000", "#006a4e", "#b57edc", "#14b8a6", "#d6008f",
   "#4b5563", "#a16207", "#1e3a8a", "#65a30d",
 ];
-function pointColor(id: string, points: { id: string }[]) {
+function pointColor(id: string, points: { id: string; seat_color?: string | null }[]) {
+  const chosen = points.find((p) => p.id === id)?.seat_color;
+  if (chosen) return chosen;
   // Reserve an exclusive shade for New Bus Terminal, independent of sort order.
   if (id === "b2a34c6f-2112-4908-8e57-836bbd8eda0a") return "var(--seat-new-terminal)";
   const sorted = [...new Set(points.map((p) => p.id))].sort();
@@ -69,6 +73,11 @@ function SeatBookingPage() {
   const [totalAmount, setTotalAmount] = useState("");
   const [staffPointId, setStaffPointId] = useState("");
   const [ticket, setTicket] = useState<TicketData | null>(null);
+  const [pName, setPName] = useState("");
+  const [pPhone, setPPhone] = useState("");
+  const [pDest, setPDest] = useState("");
+  const [groupFor, setGroupFor] = useState<string | null>(null);
+  const [editRow, setEditRow] = useState<(Record<string, unknown> & { id: string }) | null>(null);
   const [fDate, setFDate] = useState(() => new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 10));
   const [fVehicle, setFVehicle] = useState("");
   const [fPoint, setFPoint] = useState("");
@@ -86,7 +95,7 @@ function SeatBookingPage() {
   const { data: points } = useQuery({
     queryKey: ["booking_points", "seat-colors"],
     queryFn: async () =>
-      (await supabase.from("booking_points").select("id, name, point_type")).data ?? [],
+      (await supabase.from("booking_points").select("id, name, point_type, seat_color")).data ?? [],
   });
 
   const { data: trips } = useQuery({
@@ -160,6 +169,31 @@ function SeatBookingPage() {
     return map;
   }, [locks, visibleByBooking, t, points]);
 
+  /** One row per booking point: repeat bookings on this trip are merged. */
+  const pointGroups = useMemo(() => {
+    const map = new Map<string, NonNullable<typeof bookings>>();
+    for (const b of bookings ?? []) {
+      const k = b.booking_point_id ?? "none";
+      const l = map.get(k);
+      if (l) l.push(b);
+      else map.set(k, [b]);
+    }
+    return [...map.entries()].map(([key, list]) => {
+      const active = list.filter((b) => b.status !== "cancelled");
+      return {
+        key,
+        list,
+        name: list[0]?.booking_points?.name ?? "—",
+        color: key !== "none" ? pointColor(key, points ?? []) : undefined,
+        tickets: list.map((b) => b.ticket_no).filter(Boolean) as string[],
+        seats: active.flatMap((b) => b.seat_numbers ?? []),
+        cancelledSeats: list.filter((b) => b.status === "cancelled").flatMap((b) => b.seat_numbers ?? []),
+        total: active.reduce((s, b) => s + Number(b.amount ?? 0), 0),
+      };
+    });
+  }, [bookings, points]);
+  const activeGroup = pointGroups.find((g) => g.key === groupFor) ?? null;
+
   const legend = useMemo(
     () =>
       [...(points ?? [])]
@@ -232,8 +266,9 @@ function SeatBookingPage() {
           seat_numbers: seats,
           fare_per_seat: seats.length > 0 ? amount / seats.length : 0,
           amount,
-          passenger_name: null,
-          passenger_phone: null,
+          passenger_name: pName.trim() || null,
+          passenger_phone: pPhone.trim() || null,
+          destination: pDest.trim() || null,
           status: "confirmed",
           created_by: session?.userId ?? null,
         })
@@ -252,12 +287,16 @@ function SeatBookingPage() {
         time: trip?.departure_time?.slice(0, 5) ?? "—",
         vehicle: trip?.vehicles?.vehicle_number ?? "—",
         seats: row.seat_numbers ?? [],
-        passengerName: "",
-        passengerPhone: "",
+        passengerName: row.passenger_name ?? "",
+        passengerPhone: row.passenger_phone ?? "",
+        destination: row.destination ?? "",
         farePerSeat: Number(row.fare_per_seat ?? 0),
         amount: Number(row.amount ?? 0),
       });
       setSeats([]);
+      setPName("");
+      setPPhone("");
+      setPDest("");
       setTotalAmount("");
       void qc.invalidateQueries({ queryKey: ["seat_bookings", tripId] });
       void qc.invalidateQueries({ queryKey: ["trip_seat_locks", tripId] });
@@ -513,6 +552,18 @@ function SeatBookingPage() {
                   required
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sb-pname">{t("passengerName")} ({t("optional")})</Label>
+                <Input id="sb-pname" value={pName} maxLength={80} onChange={(e) => setPName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sb-pphone">{t("passengerPhone")} ({t("optional")})</Label>
+                <Input id="sb-pphone" type="tel" value={pPhone} maxLength={20} onChange={(e) => setPPhone(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sb-pdest">{t("destination")} ({t("optional")})</Label>
+                <Input id="sb-pdest" value={pDest} maxLength={80} onChange={(e) => setPDest(e.target.value)} />
+              </div>
               <Button type="submit" disabled={book.isPending} className="self-end">
                 {t("confirmBooking")}
               </Button>
@@ -541,33 +592,29 @@ function SeatBookingPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {bookings?.map((b) => (
-                <TableRow key={b.id}>
-                  <TableCell className="font-mono text-xs">{b.ticket_no ?? "—"}</TableCell>
-                  <TableCell className="font-semibold">{b.booking_points?.name ?? "—"}</TableCell>
-                  <TableCell
-                    className={b.status === "cancelled" ? "line-through opacity-60" : "text-destructive"}
-                  >
-                    {(b.seat_numbers ?? []).join(", ")}
+              {pointGroups.map((g) => (
+                <TableRow key={g.key}>
+                  <TableCell className="font-mono text-xs">{g.tickets.join(", ") || "—"}</TableCell>
+                  <TableCell className="font-semibold">
+                    <span className="flex items-center gap-2">
+                      <span className="size-3 rounded-sm" style={{ background: g.color }} />
+                      {g.name} {g.list.length > 1 && <span className="text-xs text-muted-foreground">×{g.list.length}</span>}
+                    </span>
                   </TableCell>
-                  <TableCell>৳{b.amount}</TableCell>
-                  <TableCell className="space-x-1 text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={t("cancelBooking")}
-                      disabled={b.status === "cancelled" || cancelBooking.isPending}
-                      onClick={() => cancelBooking.mutate(b.id)}
-                    >
-                      <XCircle className="size-4 text-destructive" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => removeBooking.mutate(b.id)}>
-                      <Trash2 className="size-4 text-destructive" />
+                  <TableCell className="text-destructive">
+                    {g.seats.join(", ")}
+                    {g.cancelledSeats.length > 0 && (
+                      <span className="ml-2 line-through opacity-60">{g.cancelledSeats.join(", ")}</span>
+                    )}
+                  </TableCell>
+                  <TableCell>৳{g.total}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm" onClick={() => setGroupFor(g.key)}>
+                      <Pencil className="size-4" /> {t("edit")}
                     </Button>
                   </TableCell>
                 </TableRow>
               ))}
-
             </TableBody>
           </Table>
           <div className="border-t border-border p-3 text-right text-sm font-semibold">
@@ -577,6 +624,85 @@ function SeatBookingPage() {
       )}
 
       <TicketDialog ticket={ticket} onClose={() => setTicket(null)} />
+
+      <Dialog open={!!activeGroup} onOpenChange={(o) => !o && setGroupFor(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{activeGroup?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {activeGroup?.list.map((b) => (
+              <div key={b.id} className="rounded-md border border-border p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className={b.status === "cancelled" ? "line-through opacity-60" : "font-semibold"}>
+                      {(b.seat_numbers ?? []).join(", ")} — ৳{b.amount}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {[b.ticket_no, b.passenger_name, b.passenger_phone, b.destination].filter(Boolean).join(" • ") || "—"}
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" title={t("edit")} onClick={() => { setGroupFor(null); setEditRow(b as Record<string, unknown> & { id: string }); }}>
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t("print")}
+                      onClick={() => {
+                        setGroupFor(null);
+                        setTicket({
+                          ticketNo: b.ticket_no ?? "—",
+                          pointName: b.booking_points?.name ?? "—",
+                          route: trip?.route ?? "—",
+                          date: trip?.departure_date ?? "—",
+                          time: trip?.departure_time?.slice(0, 5) ?? "—",
+                          vehicle: trip?.vehicles?.vehicle_number ?? "—",
+                          seats: b.seat_numbers ?? [],
+                          passengerName: b.passenger_name ?? "",
+                          passengerPhone: b.passenger_phone ?? "",
+                          destination: b.destination ?? "",
+                          farePerSeat: Number(b.fare_per_seat ?? 0),
+                          amount: Number(b.amount ?? 0),
+                        });
+                      }}
+                    >
+                      <Printer className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t("cancelBooking")}
+                      disabled={b.status === "cancelled" || cancelBooking.isPending}
+                      onClick={() => cancelBooking.mutate(b.id)}
+                    >
+                      <XCircle className="size-4 text-destructive" />
+                    </Button>
+                    <Button variant="ghost" size="icon" title={t("delete")} onClick={() => { if (window.confirm(t("delete") + "?")) removeBooking.mutate(b.id); }}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <EditRowDialog
+        table="seat_bookings"
+        row={editRow}
+        onClose={() => setEditRow(null)}
+        queryKey={["seat_bookings", tripId]}
+        fields={[
+          { key: "passenger_name", label: t("passengerName"), maxLength: 80 },
+          { key: "passenger_phone", label: t("passengerPhone"), maxLength: 20 },
+          { key: "destination", label: t("destination"), maxLength: 80 },
+          { key: "amount", label: t("amount"), type: "number" },
+          { key: "note", label: t("note"), maxLength: 200 },
+        ]}
+      />
     </div>
   );
 }
