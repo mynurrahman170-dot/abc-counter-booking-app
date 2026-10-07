@@ -18,14 +18,17 @@ export function printDocument(title: string, bodyHtml: string, opts: { pos?: boo
   .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
   .total { border-top: 1px solid #333; margin-top: 8px; padding-top: 8px; font-weight: 700; }
   @media print { body { margin: 10mm; } }
-  ${opts.pos ? `@page { size: 80mm auto; margin: 2mm; }
-  body { width: 72mm; margin: 0 auto; font-size: 12px; }
-  .ticket { max-width: none; width: 100%; padding: 6px; border: 1px dashed #000; }
-  .ticket h1 { font-size: 16px; text-align: center; }
+  ${opts.pos ? `@page { size: 58mm auto; margin: 2mm; }
+  html { width: 58mm; }
+  body { width: 54mm; margin: 0 auto; font-size: 11px; }
+  .ticket { max-width: none; width: 100%; padding: 4px; border: 1px dashed #000; break-inside: avoid; }
+  .ticket h1 { font-size: 14px; text-align: center; }
   .copy { text-align: center; font-weight: 700; border: 1px solid #000; padding: 2px; margin: 4px 0; }
-  .row { font-size: 12px; gap: 6px; }
+  .row { font-size: 11px; gap: 4px; align-items: flex-start; }
+  .row > span:first-child { flex: 0 0 42%; }
+  .row > strong, .row > span:last-child { min-width: 0; overflow-wrap: anywhere; text-align: right; }
   .cut { border-top: 1px dashed #000; margin: 10px 0; text-align: center; font-size: 10px; }
-  @media print { body { margin: 0 auto; } .cut { page-break-after: always; } }` : ""}
+  @media print { body { margin: 0 auto; } }` : ""}
 </style></head><body>${bodyHtml}
 <script>window.onload = function(){ window.focus(); window.print(); };</script>
 </body></html>`);
