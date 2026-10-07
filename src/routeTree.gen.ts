@@ -17,6 +17,7 @@ import { Route as AuthenticatedAiSummaryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedBookingPointsRouteImport } from './routes/_authenticated/booking-points'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedChangeHistoryRouteImport } from './routes/_authenticated/change-history'
+import { Route as AuthenticatedDailyScheduleRouteImport } from './routes/_authenticated/daily-schedule'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDatabaseRouteImport } from './routes/_authenticated/database'
 import { Route as AuthenticatedReconcileRouteImport } from './routes/_authenticated/reconcile'
@@ -66,6 +67,12 @@ const AuthenticatedChangeHistoryRoute =
   AuthenticatedChangeHistoryRouteImport.update({
     id: '/change-history',
     path: '/change-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDailyScheduleRoute =
+  AuthenticatedDailyScheduleRouteImport.update({
+    id: '/daily-schedule',
+    path: '/daily-schedule',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/booking-points': typeof AuthenticatedBookingPointsRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/change-history': typeof AuthenticatedChangeHistoryRoute
+  '/daily-schedule': typeof AuthenticatedDailyScheduleRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
   '/reconcile': typeof AuthenticatedReconcileRoute
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/booking-points': typeof AuthenticatedBookingPointsRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/change-history': typeof AuthenticatedChangeHistoryRoute
+  '/daily-schedule': typeof AuthenticatedDailyScheduleRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/database': typeof AuthenticatedDatabaseRoute
   '/reconcile': typeof AuthenticatedReconcileRoute
@@ -162,6 +171,7 @@ export interface FileRoutesById {
   '/_authenticated/booking-points': typeof AuthenticatedBookingPointsRoute
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/change-history': typeof AuthenticatedChangeHistoryRoute
+  '/_authenticated/daily-schedule': typeof AuthenticatedDailyScheduleRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/database': typeof AuthenticatedDatabaseRoute
   '/_authenticated/reconcile': typeof AuthenticatedReconcileRoute
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/booking-points'
     | '/bookings'
     | '/change-history'
+    | '/daily-schedule'
     | '/dashboard'
     | '/database'
     | '/reconcile'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/booking-points'
     | '/bookings'
     | '/change-history'
+    | '/daily-schedule'
     | '/dashboard'
     | '/database'
     | '/reconcile'
@@ -219,6 +231,7 @@ export interface FileRouteTypes {
     | '/_authenticated/booking-points'
     | '/_authenticated/bookings'
     | '/_authenticated/change-history'
+    | '/_authenticated/daily-schedule'
     | '/_authenticated/dashboard'
     | '/_authenticated/database'
     | '/_authenticated/reconcile'
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChangeHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/daily-schedule': {
+      id: '/_authenticated/daily-schedule'
+      path: '/daily-schedule'
+      fullPath: '/daily-schedule'
+      preLoaderRoute: typeof AuthenticatedDailyScheduleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -366,6 +386,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBookingPointsRoute: typeof AuthenticatedBookingPointsRoute
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
   AuthenticatedChangeHistoryRoute: typeof AuthenticatedChangeHistoryRoute
+  AuthenticatedDailyScheduleRoute: typeof AuthenticatedDailyScheduleRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDatabaseRoute: typeof AuthenticatedDatabaseRoute
   AuthenticatedReconcileRoute: typeof AuthenticatedReconcileRoute
@@ -383,6 +404,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBookingPointsRoute: AuthenticatedBookingPointsRoute,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
   AuthenticatedChangeHistoryRoute: AuthenticatedChangeHistoryRoute,
+  AuthenticatedDailyScheduleRoute: AuthenticatedDailyScheduleRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDatabaseRoute: AuthenticatedDatabaseRoute,
   AuthenticatedReconcileRoute: AuthenticatedReconcileRoute,
