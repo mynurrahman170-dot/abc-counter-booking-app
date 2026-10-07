@@ -23,9 +23,9 @@ import {
 export const Route = createFileRoute("/_authenticated/schedule")({
   head: () => ({
     meta: [
-      { title: "Schedule Board | Car Booking Database" },
+      { title: "Schedule Maker | ZB SYSTEM" },
       { name: "description", content: "Live schedule board of routes, departures, fares and supervisors." },
-      { property: "og:title", content: "Schedule Board | Car Booking Database" },
+      { property: "og:title", content: "Schedule Maker | ZB SYSTEM" },
       { property: "og:description", content: "Routes, departure times, fares and supervisors." },
     ],
   }),

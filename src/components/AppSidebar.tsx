@@ -29,6 +29,7 @@ const items: {
   { to: "/bookings", key: "bookingsList", icon: Ticket },
   { to: "/reports", key: "reports", icon: BarChart3 },
   { to: "/schedule", key: "scheduleBoard", icon: CalendarClock },
+  { to: "/daily-schedule", key: "dailySchedule", icon: CalendarClock },
   { to: "/reconcile", key: "reconcile", icon: Calculator },
   { to: "/vehicles", key: "vehicles", icon: Bus, roles: ["master_admin", "moderator"] },
   { to: "/routes", key: "routes", icon: RouteIcon },
