@@ -68,6 +68,8 @@ function DailySchedulePage() {
   const rows = byVehicle.filter((r) => (r.trip_direction === "down" ? "down" : "up") === dir);
   const countUp = byVehicle.filter((r) => r.trip_direction !== "down").length;
   const countDown = byVehicle.length - countUp;
+  const routeGroups = Array.from(new Set(rows.map((r) => r.route))).sort((a, b) => a.localeCompare(b, "bn"))
+    .map((route) => ({ route, trips: rows.filter((r) => r.route === route) }));
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -99,7 +101,12 @@ function DailySchedulePage() {
         </div>
       </div>
 
-      <div className="panel overflow-x-auto">
+      {(isLoading || !date) && <p>{t("loading")}</p>}
+      {date && !isLoading && rows.length === 0 && <p className="text-muted-foreground">{t("noData")}</p>}
+      {routeGroups.map((group) => (
+      <section key={group.route} className="space-y-3">
+        <h2 className="border-b border-border pb-2 text-lg font-semibold">{group.route} <span className="text-sm text-muted-foreground">({group.trips.length})</span></h2>
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -119,7 +126,7 @@ function DailySchedulePage() {
             {date && !isLoading && rows.length === 0 && (
               <TableRow><TableCell colSpan={7} className="text-muted-foreground">{t("noData")}</TableCell></TableRow>
             )}
-            {rows.map((r) => (
+            {group.trips.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>{r.departure_date}</TableCell>
                 <TableCell className="font-semibold">{r.departure_time}</TableCell>
@@ -133,6 +140,8 @@ function DailySchedulePage() {
           </TableBody>
         </Table>
       </div>
+      </section>
+      ))}
     </div>
   );
 }

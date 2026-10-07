@@ -21,9 +21,11 @@ export type TicketData = {
 export function TicketDialog({
   ticket,
   onClose,
+  copyType = "both",
 }: {
   ticket: TicketData | null;
   onClose: () => void;
+  copyType?: "both" | "passenger" | "office";
 }) {
   const { t } = useI18n();
   if (!ticket) return null;
@@ -49,7 +51,9 @@ export function TicketDialog({
       ${rows.map(([k, v]) => `<div class="row"><span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong></div>`).join("")}
       <div class="row total"><span>${escapeHtml(t("totalAmount"))}</span><span>৳${escapeHtml(ticket.amount)}</span></div>
     </div>`;
-    const body = `${copy(t("passengerCopy"))}<div class="cut">✂ - - - - - - - - - - - -</div>${copy(t("officeCopy"))}`;
+    const body = copyType === "both"
+      ? `${copy(t("passengerCopy"))}<div class="cut">✂ - - - - - - - - - - - -</div>${copy(t("officeCopy"))}`
+      : copy(t(copyType === "passenger" ? "passengerCopy" : "officeCopy"));
     printDocument(`${t("ticketReceipt")} ${ticket.ticketNo}`, body, { pos: true });
   }
 
@@ -57,13 +61,13 @@ export function TicketDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("bookingConfirmed")}</DialogTitle>
+          <DialogTitle>{copyType === "both" ? t("bookingConfirmed") : t(copyType === "passenger" ? "passengerCopy" : "officeCopy")}</DialogTitle>
         </DialogHeader>
         <div className="rounded-lg border border-dashed border-border p-4 text-sm">
           {rows.map(([k, v]) => (
-            <div key={k} className="flex justify-between py-1">
+            <div key={k} className="flex justify-between gap-3 py-1">
               <span className="text-muted-foreground">{k}</span>
-              <strong>{v}</strong>
+              <strong className="min-w-0 break-words text-right">{v}</strong>
             </div>
           ))}
           <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-bold">

@@ -1,3 +1,6 @@
 - [x] Make the 42-seat plan A–I (four each), J1–J5, and EX-1; retain the photo-matched 46-seat plan and driver position.
 - [x] Keep booking validation aligned with both layouts and verify seat counts and rendering.
 - [x] Give New Bus Terminal booked seats a distinct, stable color and verify it differs from every other point.
+- [ ] Format both receipt copies for 58 mm paper and verify a real booking's print preview.
+- [ ] Preserve ticket copies and add a searchable archive page.
+- [ ] Group daily schedules by route.
