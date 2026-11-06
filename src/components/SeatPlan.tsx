@@ -40,16 +40,20 @@ export function SeatPlan({ rows, bookedMap, selected, onToggle }: Props) {
                       title={booked?.point}
                       onClick={() => onToggle(seat)}
                       disabled={Boolean(booked)}
-                      className={`h-10 w-10 rounded-md border p-0 text-[10px] font-semibold transition-colors sm:w-12 sm:text-xs ${
+                      className={`relative flex h-10 w-10 flex-col items-center justify-end gap-1 rounded-xl border-2 pb-1.5 text-[10px] font-semibold shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-12 sm:text-xs ${
                         booked
                           ? "cursor-not-allowed border-destructive bg-destructive text-destructive-foreground disabled:opacity-100"
                           : isSelected
                             ? "border-primary bg-primary text-primary-foreground"
-                            : "border-input bg-background text-foreground hover:border-primary"
+                            : "border-input bg-background text-foreground hover:border-primary hover:shadow-md"
                       }`}
                       style={{ gridColumn: column, ...(booked?.color ? { background: booked.color, borderColor: booked.color, color: "white" } : {}) }}
                     >
-                      {seat}
+                      <span className="leading-none">{seat}</span>
+                      <span
+                        aria-hidden="true"
+                        className={`h-1 w-5 rounded-full ${booked || isSelected ? "bg-current opacity-40" : "bg-muted-foreground/20"}`}
+                      />
                     </Button>
                 );
               })}
