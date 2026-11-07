@@ -24,7 +24,7 @@ function AuthedLayout() {
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center gap-3 border-b border-border bg-card px-3">
+          <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-card px-3">
             <SidebarTrigger />
             <span className="font-display text-lg uppercase tracking-wide">{t("appName")}</span>
             <div className="ml-auto flex items-center gap-3">
