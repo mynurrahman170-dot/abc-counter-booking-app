@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCw, X } from "lucide-react";
+import { FileDown, Printer, RefreshCw, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { escapeHtml, printDocument } from "@/lib/print";
 
 export const Route = createFileRoute("/_authenticated/reconcile")({
   head: () => ({
@@ -132,14 +133,33 @@ function ReconcilePage() {
   const totals = rows.reduce((a, r) => ({ up: a.up + r.up, down: a.down + r.down }), { up: 0, down: 0 });
   const join = (s: Set<string>) => (s.size ? [...s].join(", ") : "—");
 
+  function printReport() {
+    const bodyRows = rows.map((r) => `<tr><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.vehicle)}${r.seq > 1 ? ` (${r.seq}য় ট্রিপ)` : ""}${r.held ? " · নাইট হোল্ড" : ""}</td><td>${escapeHtml(join(r.routes))}</td><td>${escapeHtml(join(r.types))}</td><td>${escapeHtml(join(r.supervisors))}</td><td>${r.up}</td><td>${r.down}</td><td>${r.up + r.down}</td></tr>`).join("");
+    printDocument(
+      `${t("reconcile")} ${from} – ${to}`,
+      `<h1>${escapeHtml(t("appName"))} — ${escapeHtml(t("reconcile"))}</h1>
+       <p class="muted">${escapeHtml(from)}${from !== to ? ` → ${escapeHtml(to)}` : ""}${vehicleQ ? ` · ${escapeHtml(t("vehicleNumber"))}: ${escapeHtml(vehicleQ)}` : ""}</p>
+       <table><thead><tr><th>${escapeHtml(t("date"))}</th><th>${escapeHtml(t("vehicleNumber"))}</th><th>${escapeHtml(t("routeName"))}</th><th>${escapeHtml(t("routeType"))}</th><th>${escapeHtml(t("supervisor"))}</th><th>${escapeHtml(t("upTotal"))}</th><th>${escapeHtml(t("downTotal"))}</th><th>${escapeHtml(t("combinedTotal"))}</th></tr></thead>
+       <tbody>${bodyRows}</tbody><tfoot><tr><td colspan="5">${escapeHtml(t("combinedTotal"))}</td><td>${totals.up}</td><td>${totals.down}</td><td>${totals.up + totals.down}</td></tr></tfoot></table>`,
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl uppercase tracking-wide">{t("reconcile")}</h1>
-        <Button type="button" disabled={isFetching} onClick={() => void refetch()}>
-          <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
-          {t("updateCombined")}
-        </Button>
+        <div className="flex flex-wrap gap-2 print:hidden">
+          <Button type="button" variant="outline" onClick={printReport}>
+            <Printer />{t("print")}
+          </Button>
+          <Button type="button" variant="outline" onClick={printReport}>
+            <FileDown />{t("exportPdf")}
+          </Button>
+          <Button type="button" disabled={isFetching} onClick={() => void refetch()}>
+            <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+            {t("updateCombined")}
+          </Button>
+        </div>
       </div>
 
       <div className="panel grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
