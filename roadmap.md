@@ -4,3 +4,6 @@
 - [ ] Format both receipt copies for 58 mm paper and verify a real booking's print preview.
 - [ ] Preserve ticket copies and add a searchable archive page.
 - [ ] Group daily schedules by route.
+- [ ] Add print and PDF-ready export actions to the reconciliation page.
+- [ ] Build dashboard filters and vehicle, booking-point, supervisor, and trip-count charts.
+- [ ] Keep the authenticated header fixed while scrolling.
